@@ -6,7 +6,7 @@ Sigue los pasos a continuación para configurar y ejecutar el proyecto:
 
 1. **Clonar el repositorio**  
    ```bash
-   git clone https://github.com/FrankoFPM/minimarket-backend.git
+   git clone https://github.com/FrankoFPM/minimarket-backend-spring.git
    cd minimarket-backend-spring
    ```
 
