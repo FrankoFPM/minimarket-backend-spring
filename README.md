@@ -43,3 +43,35 @@ Sigue los pasos a continuación para configurar y ejecutar el proyecto:
 
 6. **Probar la API**  
    Una vez que la aplicación esté en ejecución, accede a `http://localhost:8080` para interactuar con la API.
+
+## Estructura del proyecto
+Para cumplir con los requisitos de MVC, DAO, TDD y SOLID, el proyecto está organizado de la siguiente manera:
+
+```
+src/main/java/org/minimarket/minimarketbackendspring/
+├── controllers       # Controladores (Capa de Presentación - MVC)
+├── services          # Servicios (Lógica de Negocio - SOLID)
+├── daos              # DAO (Acceso a Datos - DAO)
+├── repositories      # Repositorios (Spring Data JPA)
+├── entities          # Entidades (Modelos - MVC)
+├── dtos              # DTOs (Opcional, para transferir datos)
+└── utils             # Utilidades (Clases de soporte)
+```
+### Definición de arquitecturas
+- **MVC (Modelo-Vista-Controlador)**: Patrón de diseño que separa la lógica de negocio, la interfaz de usuario y el control de flujo.
+- **DAO (Data Access Object)**: Patrón de diseño que proporciona una interfaz abstracta para acceder a los datos.
+- **TDD (Test Driven Development)**: Enfoque de desarrollo que implica escribir pruebas antes de escribir el código de producción.
+- **SOLID**: Conjunto de principios de diseño orientado a objetos que promueven la mantenibilidad y escalabilidad del software.
+- **Spring Data JPA**: Framework que simplifica el acceso a datos en aplicaciones Java, proporcionando una capa de abstracción sobre JPA (Java Persistence API).
+
+## Completados
+- [x] Crear un proyecto Spring Boot.
+- [x] Crear un controlador REST.
+- [x] Crear un servicio.
+- [x] Implementar JPA.
+
+## Pendientes
+- [ ] Aplicar la libreria Google Guava para la paginación.
+- [ ] Aplicar la libreria Apache POI para la exportación a Excel.
+- [ ] Aplicar la libreria Apache Commons para la exportación a PDF.
+- [ ] Aplicar la libreria LogBack para el registro de logs.
