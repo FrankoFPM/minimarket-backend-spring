@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
+ *<h1><strong>Clase DAO DEPRECADA:</strong> Esta clase es una implementación de la interfaz.</h1>
+ *
+ *
  * Implementación de la interfaz DepartamentoDAO utilizando JPA EntityManager.
  *
  * <p>
@@ -79,4 +82,5 @@ public class DepartamentoDaoImpl implements DepartamentoDAO {
     public void delete(Departamento departamento) {
         entityManager.remove(departamento);
     }
+
 }
