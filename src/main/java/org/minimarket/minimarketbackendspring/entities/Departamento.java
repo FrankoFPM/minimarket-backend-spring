@@ -15,7 +15,7 @@ import java.util.Set;
 public class Departamento {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DEPARTAMENTO_id_gen")
-    @SequenceGenerator(name = "DEPARTAMENTO_id_gen", sequenceName = "ISEQ$$_76643", allocationSize = 1)
+    @SequenceGenerator(name = "DEPARTAMENTO_id_gen", sequenceName = "departamento_seq", allocationSize = 1)
     @Column(name = "ID_DEPARTAMENTO", nullable = false)
     private Long id;
 
@@ -30,23 +30,17 @@ public class Departamento {
     @Column(name = "ESTADO", nullable = false, length = 10)
     private String estado;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "CREATED_AT")
+    @Column(name = "CREATED_AT", updatable = false, insertable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
     private Instant createdAt;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "UPDATED_AT")
+    @Column(name = "UPDATED_AT", insertable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "CREATED_BY")
-    private org.minimarket.minimarketbackendspring.entities.Usuario createdBy;
+    @Column(name = "CREATED_BY", length = 36)
+    private String createdBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "UPDATE_BY")
-    private org.minimarket.minimarketbackendspring.entities.Usuario updateBy;
+    @Column(name = "UPDATE_BY", length = 36)
+    private String updateBy;
 
     @OneToMany(mappedBy = "idDepartamento")
     @JsonManagedReference
@@ -100,19 +94,19 @@ public class Departamento {
         this.updatedAt = updatedAt;
     }
 
-    public org.minimarket.minimarketbackendspring.entities.Usuario getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(org.minimarket.minimarketbackendspring.entities.Usuario createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public org.minimarket.minimarketbackendspring.entities.Usuario getUpdateBy() {
+    public String getUpdateBy() {
         return updateBy;
     }
 
-    public void setUpdateBy(org.minimarket.minimarketbackendspring.entities.Usuario updateBy) {
+    public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
     }
 

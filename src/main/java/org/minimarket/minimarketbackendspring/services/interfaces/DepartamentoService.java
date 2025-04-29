@@ -1,6 +1,6 @@
 package org.minimarket.minimarketbackendspring.services.interfaces;
 
-import org.minimarket.minimarketbackendspring.entities.Departamento;
+import org.minimarket.minimarketbackendspring.dtos.DepartamentoDTO;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface DepartamentoService {
      *
      * @return una lista de objetos de tipo Departamento
      */
-    List<Departamento> findAll();
+    List<DepartamentoDTO> findAll();
 
     /**
      * Busca un departamento por su ID.
@@ -26,21 +26,30 @@ public interface DepartamentoService {
      * @param id el identificador del departamento
      * @return el departamento encontrado o null si no existe
      */
-    Departamento findById(Long id);
+    DepartamentoDTO  findById(Long id);
 
     /**
-     * Guarda un nuevo departamento.
+     * Obtiene una lista de todos los departamentos activos.
      *
-     * @param departamento el objeto Departamento a guardar
+     * @return una lista de objetos de tipo Departamento
      */
-    void save(Departamento departamento);
+    List<DepartamentoDTO> findByEstado(String estado);
 
     /**
-     * Actualiza un departamento existente.
+     * Guarda un nuevo departamento en la base de datos.
      *
-     * @param departamento el objeto Departamento a actualizar
+     * @param departamento el objeto DepartamentoDTO que contiene los datos del departamento a guardar
+     * @throws IllegalArgumentException si los datos del departamento no son válidos
      */
-    void update(Departamento departamento);
+    void save(DepartamentoDTO departamento);
+
+    /**
+     * Actualiza un departamento existente en la base de datos.
+     *
+     * @param departamento el objeto DepartamentoDTO que contiene los datos actualizados del departamento
+     * @throws jakarta.persistence.EntityNotFoundException si el departamento con el ID especificado no existe
+     */
+    void update(DepartamentoDTO departamento);
 
     /**
      * Elimina un departamento por su ID.
