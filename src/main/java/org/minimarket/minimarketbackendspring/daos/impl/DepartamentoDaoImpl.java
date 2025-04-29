@@ -7,19 +7,24 @@ import org.minimarket.minimarketbackendspring.entities.Departamento;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
 /**
  * Implementación de la interfaz DepartamentoDAO utilizando JPA EntityManager.
  *
- * <p><strong>IMPORTANTE:</strong> Esta clase solo debe realizar operaciones de acceso
- * a datos (persistencia, consulta, eliminación). Todas las validaciones de negocio
- * deben ser gestionadas en la capa de servicios (Service) para respetar el principio
- * de responsabilidad única (SRP) de SOLID.</p>
+ * <p>
+ * <strong>IMPORTANTE:</strong> Esta clase solo debe realizar operaciones de
+ * acceso
+ * a datos (persistencia, consulta, eliminación). Todas las validaciones de
+ * negocio
+ * deben ser gestionadas en la capa de servicios (Service) para respetar el
+ * principio
+ * de responsabilidad única (SRP) de SOLID.
+ * </p>
  */
 @Repository
 public class DepartamentoDaoImpl implements DepartamentoDAO {
     @PersistenceContext
     private EntityManager entityManager;
-
 
     /**
      * Obtiene una lista de todos los departamentos.
@@ -65,7 +70,7 @@ public class DepartamentoDaoImpl implements DepartamentoDAO {
     }
 
     /**
-     * /**
+     *
      * Elimina un departamento.
      *
      * @param departamento el objeto Departamento a eliminar
