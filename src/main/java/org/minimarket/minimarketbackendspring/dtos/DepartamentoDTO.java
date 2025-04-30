@@ -5,7 +5,7 @@ import org.minimarket.minimarketbackendspring.entities.Usuario;
 import java.time.Instant;
 
 public class DepartamentoDTO {
-    //TODO validar los campos de entrada
+    //TODO validar los campos de entradaa
     private Long id;
     private String nombre;
     private String descripcion;
