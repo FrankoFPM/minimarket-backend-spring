@@ -1,31 +1,35 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
-
 import java.time.Instant;
 
-public class DepartamentoDTO {
-    //TODO validar los campos de entradaa
+/**
+ * DTO para la entidad Distrito.
+ */
+public class DistritoDTO {
     private Long id;
     private String nombre;
     private String descripcion;
     private String estado;
-    private String createdBy;
-    private String updatedBy;
+    private Long idDepartamento;
     private Instant createdAt;
     private Instant updatedAt;
 
-    public DepartamentoDTO(Long id, String nombre, String descripcion, String estado, String createdBy, String updatedBy, Instant createdAt, Instant updatedAt) {
+    // Constructor vacío
+    public DistritoDTO() {
+    }
+
+    // Constructor con todos los campos
+    public DistritoDTO(Long id, String nombre, String descripcion, String estado, Long idDepartamento, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.estado = estado;
-        this.createdBy = createdBy;
-        this.updatedBy = updatedBy;
+        this.idDepartamento = idDepartamento;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -58,20 +62,12 @@ public class DepartamentoDTO {
         this.estado = estado;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public Long getIdDepartamento() {
+        return idDepartamento;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
+    public void setIdDepartamento(Long idDepartamento) {
+        this.idDepartamento = idDepartamento;
     }
 
     public Instant getCreatedAt() {
