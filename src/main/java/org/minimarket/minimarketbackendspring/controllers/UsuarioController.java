@@ -1,6 +1,7 @@
 package org.minimarket.minimarketbackendspring.controllers;
 
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
+import org.minimarket.minimarketbackendspring.dtos.requests.LoginRequestDTO;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -103,6 +104,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.findByRol(rol));
     }
 
+
     /**
      * Crea un nuevo usuario.
      *
@@ -124,7 +126,7 @@ public class UsuarioController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateUsuario(@PathVariable String id, @RequestBody UsuarioDTO usuario) {
-        usuario.setIdUsuario(id);
+        usuario.setId(id);
         usuarioService.update(usuario);
         return ResponseEntity.ok().build();
     }
@@ -139,5 +141,15 @@ public class UsuarioController {
     public ResponseEntity<Void> deleteUsuario(@PathVariable String id) {
         usuarioService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/auth")
+    public ResponseEntity<Boolean> authenticate(@RequestBody LoginRequestDTO loginRequestDTO) {
+        boolean isAuthenticated = usuarioService.authenticate(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+        if (isAuthenticated) {
+            return ResponseEntity.ok(true); // OK
+        } else {
+            return ResponseEntity.status(401).body(false); // Unauthorized
+        }
     }
 }

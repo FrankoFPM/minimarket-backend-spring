@@ -1,11 +1,13 @@
 package org.minimarket.minimarketbackendspring.services.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.minimarket.minimarketbackendspring.dtos.DistritoDTO;
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.entities.Distrito;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.repositories.DistritoRepository;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
+import org.minimarket.minimarketbackendspring.services.interfaces.DistritoService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private DistritoRepository distritoRepository;
+    @Autowired
+    private DistritoService distritoService;
 
     /**
      * Convierte una entidad Usuario a UsuarioDTO.
@@ -39,16 +43,17 @@ public class UsuarioServiceImpl implements UsuarioService {
                 u.getNombre(),
                 u.getApellido(),
                 u.getEmail(),
-                u.getClave(),
                 u.getTelefono(),
+                u.getClave(),
                 u.getIdDistrito() != null ? u.getIdDistrito().getId() : null,
+                u.getIdDistrito() != null ? u.getIdDistrito().getNombre() : null,
                 u.getDireccion(),
                 u.getGoogleId(),
                 u.getFacebookId(),
                 u.getRol(),
                 u.getEstado(),
-                u.getCreatedAt(),
-                u.getUpdatedAt()
+                null, // createdBy (ajusta si tienes este dato en la entidad)
+                null  // updatedBy (ajusta si tienes este dato en la entidad)
         );
     }
 
@@ -141,6 +146,11 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .collect(Collectors.toList());
     }
 
+    /*
+    insert into usuarios (nombre, apellido, email, clave, telefono, id_distrito, direccion, rol)
+    values ('Franco', 'PM','example@example.com','123456789','987654321',1,'Calle Falsa 123','admin');
+    * */
+
     /**
      * Guarda un nuevo usuario.
      *
@@ -151,27 +161,36 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario u = new Usuario();
         
         // Aqui se genera un ID único para nuevos usuarios :D
-        if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isEmpty()) {
+        if (usuario.getId() == null || usuario.getId().isEmpty()) {
             u.setIdUsuario(UUID.randomUUID().toString());
         } else {
-            u.setIdUsuario(usuario.getIdUsuario());
+            u.setIdUsuario(usuario.getId());
         }
         
         u.setNombre(usuario.getNombre());
         u.setApellido(usuario.getApellido());
         u.setEmail(usuario.getEmail());
-        u.setClave(usuario.getClave());
+        u.setClave(usuario.getPassword());
         u.setTelefono(usuario.getTelefono());
+
+        if (usuario.getDistritoId() != null) {
+            Distrito distrito = distritoRepository.findById(usuario.getDistritoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getDistritoId()));
+            u.setIdDistrito(distrito);
+        } else {
+            u.setIdDistrito(null);
+        }
+
         u.setDireccion(usuario.getDireccion());
+        u.setRol(usuario.getRol() != null ? usuario.getRol() : "cliente"); // Asignar rol por defecto
         u.setGoogleId(usuario.getGoogleId());
         u.setFacebookId(usuario.getFacebookId());
-        u.setRol(usuario.getRol());
-        u.setEstado(usuario.getEstado());
+        u.setEstado("activo"); // Asignar estado por defecto
 
         // Asignar distrito proporcionando ID
-        if (usuario.getIdDistrito() != null) {
-            Distrito distrito = distritoRepository.findById(usuario.getIdDistrito())
-                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getIdDistrito()));
+        if (usuario.getDistritoId() != null) {
+            Distrito distrito = distritoRepository.findById(usuario.getDistritoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getDistritoId()));
             u.setIdDistrito(distrito);
         }
 
@@ -185,16 +204,16 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     @Override
     public void update(UsuarioDTO usuario) {
-        Usuario u = usuarioRepository.findById(usuario.getIdUsuario())
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + usuario.getIdUsuario()));
+        Usuario u = usuarioRepository.findById(usuario.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + usuario.getId()));
 
         u.setNombre(usuario.getNombre());
         u.setApellido(usuario.getApellido());
         u.setEmail(usuario.getEmail());
         
         // Aqui actualiza la clave si se proporciona una nueva
-        if (usuario.getClave() != null && !usuario.getClave().isEmpty()) {
-            u.setClave(usuario.getClave());
+        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+            u.setClave(usuario.getPassword());
         }
         
         u.setTelefono(usuario.getTelefono());
@@ -205,9 +224,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         u.setEstado(usuario.getEstado());
 
         // Actualizar distrito si se proporciona ID
-        if (usuario.getIdDistrito() != null) {
-            Distrito distrito = distritoRepository.findById(usuario.getIdDistrito())
-                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getIdDistrito()));
+        if (usuario.getDistritoId() != null) {
+            Distrito distrito = distritoRepository.findById(usuario.getDistritoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getDistritoId()));
             u.setIdDistrito(distrito);
         } else {
             u.setIdDistrito(null);
@@ -227,5 +246,17 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + id);
         }
         usuarioRepository.deleteById(id);
+    }
+
+    /**
+     * @param email
+     * @param password
+     * @return true si la autenticación es exitosa, false en caso contrario
+     */
+    @Override
+    public boolean authenticate(String email, String password) {
+        return usuarioRepository.findByEmail(email)
+                .stream()
+                .anyMatch(u -> u.getEmail().equals(email) && u.getClave().equals(password));
     }
 }
