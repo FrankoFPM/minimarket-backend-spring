@@ -1,56 +1,49 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/**
- * DTO para la entidad Usuario.
- */
 public class UsuarioDTO {
-    private String idUsuario;
+    private String id;
     private String nombre;
     private String apellido;
     private String email;
-    private String clave;
     private String telefono;
-    private Long idDistrito;
-    private String direccion;
+    @JsonIgnore
+    private String password;
+    private String distritoId;
     private String googleId;
     private String facebookId;
+    @JsonIgnore
     private String rol;
+    @JsonIgnore
     private String estado;
-    private Instant createdAt;
-    private Instant updatedAt;
+    @JsonIgnore
+    private String createdBy;
+    @JsonIgnore
+    private String updatedBy;
 
-    // Constructores
-    public UsuarioDTO() {
-    }
-
-    public UsuarioDTO(String idUsuario, String nombre, String apellido, String email, String clave,
-                      String telefono, Long idDistrito, String direccion, String googleId,
-                      String facebookId, String rol, String estado, Instant createdAt, Instant updatedAt) {
-        this.idUsuario = idUsuario;
+    public UsuarioDTO(String id, String nombre, String apellido, String email, String telefono, String password, String distritoId, String googleId, String facebookId, String rol, String estado, String createdBy, String updatedBy) {
+        this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
-        this.clave = clave;
         this.telefono = telefono;
-        this.idDistrito = idDistrito;
-        this.direccion = direccion;
+        this.password = password;
+        this.distritoId = distritoId;
         this.googleId = googleId;
         this.facebookId = facebookId;
         this.rol = rol;
         this.estado = estado;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
     }
 
-    // Getters y Setters
-    public String getIdUsuario() {
-        return idUsuario;
+    public String getId() {
+        return id;
     }
 
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -77,60 +70,12 @@ public class UsuarioDTO {
         this.email = email;
     }
 
-    public String getClave() {
-        return clave;
+    public String getPassword() {
+        return password;
     }
 
-    public void setClave(String clave) {
-        this.clave = clave;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public Long getIdDistrito() {
-        return idDistrito;
-    }
-
-    public void setIdDistrito(Long idDistrito) {
-        this.idDistrito = idDistrito;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public String getGoogleId() {
-        return googleId;
-    }
-
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
-    }
-
-    public String getFacebookId() {
-        return facebookId;
-    }
-
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEstado() {
@@ -141,19 +86,59 @@ public class UsuarioDTO {
         this.estado = estado;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public String getDistritoId() {
+        return distritoId;
+    }
+
+    public void setDistritoId(String distritoId) {
+        this.distritoId = distritoId;
+    }
+
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
     }
 }

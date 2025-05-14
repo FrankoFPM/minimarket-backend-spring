@@ -11,6 +11,8 @@ import java.util.Optional;
  */
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
+
+
     /**
      * Encuentra un usuario por su dirección de email.
      *

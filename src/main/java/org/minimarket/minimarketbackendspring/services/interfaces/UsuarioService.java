@@ -13,7 +13,7 @@ public interface UsuarioService {
     /**
      * Obtiene una lista de todos los usuarios.
      *
-     * @return 
+     * @return
      */
     List<UsuarioDTO> findAll();
 
@@ -29,7 +29,7 @@ public interface UsuarioService {
      * Busca un usuario por su email.
      *
      * @param email el email del usuario
-     * @return 
+     * @return
      */
     Optional<UsuarioDTO> findByEmail(String email);
 
@@ -45,7 +45,7 @@ public interface UsuarioService {
      * Busca un usuario por su ID de Google.
      *
      * @param googleId el ID de Google del usuario
-     * @return 
+     * @return
      */
     Optional<UsuarioDTO> findByGoogleId(String googleId);
 
@@ -75,14 +75,16 @@ public interface UsuarioService {
     /**
      * Actualiza un usuario existente.
      *
-     * @param usuario 
+     * @param usuario
      */
     void update(UsuarioDTO usuario);
 
     /**
      * Elimina un usuario por su ID.
      *
-     * @param id 
+     * @param id
      */
     void delete(String id);
+
+    boolean authenticate(String email, String password);
 }
