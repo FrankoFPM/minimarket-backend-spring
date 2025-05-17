@@ -2,6 +2,7 @@ package org.minimarket.minimarketbackendspring.controllers;
 
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.dtos.requests.LoginRequestDTO;
+import org.minimarket.minimarketbackendspring.services.interfaces.AuthService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,8 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private AuthService authService;
 
     /**
      * Obtiene una lista de todos los usuarios.
@@ -145,7 +148,7 @@ public class UsuarioController {
 
     @PostMapping("/auth")
     public ResponseEntity<Boolean> authenticate(@RequestBody LoginRequestDTO loginRequestDTO) {
-        boolean isAuthenticated = usuarioService.authenticate(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+        boolean isAuthenticated = authService.authenticate(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
         if (isAuthenticated) {
             return ResponseEntity.ok(true); // OK
         } else {
