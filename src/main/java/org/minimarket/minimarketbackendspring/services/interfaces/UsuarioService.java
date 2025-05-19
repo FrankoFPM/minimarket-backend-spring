@@ -85,6 +85,4 @@ public interface UsuarioService {
      * @param id
      */
     void delete(String id);
-
-    boolean authenticate(String email, String password);
 }

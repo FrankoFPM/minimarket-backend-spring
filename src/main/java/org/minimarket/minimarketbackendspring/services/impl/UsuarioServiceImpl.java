@@ -10,6 +10,7 @@ import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
 import org.minimarket.minimarketbackendspring.services.interfaces.DistritoService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +31,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     private DistritoRepository distritoRepository;
     @Autowired
     private DistritoService distritoService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * Convierte una entidad Usuario a UsuarioDTO.
@@ -170,7 +174,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         u.setNombre(usuario.getNombre());
         u.setApellido(usuario.getApellido());
         u.setEmail(usuario.getEmail());
-        u.setClave(usuario.getPassword());
+        u.setClave(passwordEncoder.encode(usuario.getPassword()));
         u.setTelefono(usuario.getTelefono());
 
         if (usuario.getDistritoId() != null) {
@@ -213,7 +217,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         
         // Aqui actualiza la clave si se proporciona una nueva
         if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-            u.setClave(usuario.getPassword());
+            u.setClave(passwordEncoder.encode(usuario.getPassword()));
         }
         
         u.setTelefono(usuario.getTelefono());
@@ -246,17 +250,5 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + id);
         }
         usuarioRepository.deleteById(id);
-    }
-
-    /**
-     * @param email
-     * @param password
-     * @return true si la autenticación es exitosa, false en caso contrario
-     */
-    @Override
-    public boolean authenticate(String email, String password) {
-        return usuarioRepository.findByEmail(email)
-                .stream()
-                .anyMatch(u -> u.getEmail().equals(email) && u.getClave().equals(password));
     }
 }
