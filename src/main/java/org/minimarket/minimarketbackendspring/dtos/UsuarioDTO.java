@@ -1,6 +1,5 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UsuarioDTO {
