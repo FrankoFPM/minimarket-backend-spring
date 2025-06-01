@@ -29,11 +29,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/products/**", "/api/usuario", "/api/usuario/**", "/api/usuario/register").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().permitAll()
+                );
                 //TODO: Implement JWT authentication
-                .httpBasic(httpBasic -> {
-                });//Plan: Implementar autenticación JWT en el futuro
+                //.httpBasic(httpBasic -> {
+                //});//Plan: Implementar autenticación JWT en el futuro
         return http.build();
     }
 

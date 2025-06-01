@@ -1,7 +1,10 @@
 package org.minimarket.minimarketbackendspring.services.impl;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.minimarket.minimarketbackendspring.dtos.DistritoDTO;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.entities.Distrito;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
@@ -13,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import jakarta.persistence.EntityNotFoundException;
 
 /**
  * Implementación del servicio de Usuario.
@@ -186,10 +186,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         u.setDireccion(usuario.getDireccion());
-        u.setRol(usuario.getRol() != null ? usuario.getRol() : "cliente"); // Asignar rol por defecto
+        u.setRol(usuario.getRol() != null ? usuario.getRol() : "cliente");
         u.setGoogleId(usuario.getGoogleId());
         u.setFacebookId(usuario.getFacebookId());
-        u.setEstado("activo"); // Asignar estado por defecto
+        u.setEstado("activo"); 
 
         // Asignar distrito proporcionando ID
         if (usuario.getDistritoId() != null) {

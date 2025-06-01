@@ -1,15 +1,24 @@
 package org.minimarket.minimarketbackendspring.controllers;
 
+import java.util.List;
+
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.dtos.requests.LoginRequestDTO;
+import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.services.interfaces.AuthService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controlador REST para manejar operaciones sobre Usuario.
@@ -148,8 +157,8 @@ public class UsuarioController {
 
     @PostMapping("/auth")
     public ResponseEntity<Boolean> authenticate(@RequestBody LoginRequestDTO loginRequestDTO) {
-        boolean isAuthenticated = authService.authenticate(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-        if (isAuthenticated) {
+        Usuario usuario = authService.authenticateTraditional(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+        if (usuario != null) {
             return ResponseEntity.ok(true); // OK
         } else {
             return ResponseEntity.status(401).body(false); // Unauthorized
