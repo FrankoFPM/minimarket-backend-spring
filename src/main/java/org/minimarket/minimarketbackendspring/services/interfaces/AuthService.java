@@ -1,5 +1,6 @@
 package org.minimarket.minimarketbackendspring.services.interfaces;
 
+import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 
 import com.google.firebase.auth.FirebaseAuthException;
@@ -13,7 +14,7 @@ public interface AuthService {
      * @return Usuario autenticado
      * @throws FirebaseAuthException Si hay error en la verificación del token
      */
-    Usuario authenticateFirebaseToken(String idToken) throws FirebaseAuthException;
+    UsuarioDTO authenticateFirebaseToken(String idToken) throws FirebaseAuthException;
     
     /**
      * Obtiene un usuario de Firebase por su email

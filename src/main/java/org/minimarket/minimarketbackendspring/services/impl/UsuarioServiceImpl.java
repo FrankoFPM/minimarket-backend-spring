@@ -41,7 +41,7 @@ public class UsuarioServiceImpl implements UsuarioService {
      * @param u la entidad Usuario
      * @return 
      */
-    private UsuarioDTO convertToDTO(Usuario u) {
+    public UsuarioDTO convertToDTO(Usuario u) {
         return new UsuarioDTO(
                 u.getIdUsuario(),
                 u.getNombre(),

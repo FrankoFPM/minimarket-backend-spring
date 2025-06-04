@@ -3,6 +3,7 @@ package org.minimarket.minimarketbackendspring.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.dtos.requests.FirebaseTokenDTO;
 import org.minimarket.minimarketbackendspring.dtos.requests.LoginRequestDTO;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
@@ -33,7 +34,7 @@ public class AuthController {
     @PostMapping("/firebase/google")
     public ResponseEntity<?> authenticateWithGoogle(@RequestBody FirebaseTokenDTO tokenDTO) {
         try {
-            Usuario usuario = authService.authenticateFirebaseToken(tokenDTO.getIdToken());
+            UsuarioDTO usuario = authService.authenticateFirebaseToken(tokenDTO.getIdToken());
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -59,7 +60,7 @@ public class AuthController {
     @PostMapping("/firebase/facebook")
     public ResponseEntity<?> authenticateWithFacebook(@RequestBody FirebaseTokenDTO tokenDTO) {
         try {
-            Usuario usuario = authService.authenticateFirebaseToken(tokenDTO.getIdToken());
+            UsuarioDTO usuario = authService.authenticateFirebaseToken(tokenDTO.getIdToken());
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

@@ -2,10 +2,13 @@ package org.minimarket.minimarketbackendspring.services.impl;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
 import org.minimarket.minimarketbackendspring.services.interfaces.AuthService;
+import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,10 +28,13 @@ public class AuthServiceImpl implements AuthService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private UsuarioServiceImpl usuarioService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Usuario authenticateFirebaseToken(String idToken) throws FirebaseAuthException {
+    public UsuarioDTO authenticateFirebaseToken(String idToken) throws FirebaseAuthException {
         // Verificar el token de Firebase
         FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
         String uid = decodedToken.getUid();
@@ -52,13 +58,16 @@ public class AuthServiceImpl implements AuthService {
         
         if (existingUser.isPresent()) {
             Usuario usuario = existingUser.get();
+            UsuarioDTO usuDTO = usuarioService.convertToDTO(usuario);
             // Actualizar IDs de proveedores si es necesario
-            updateSocialProviderIds(usuario, uid, providerId);
-            return usuarioRepository.save(usuario);
+            updateSocialProviderIds(usuDTO, uid, providerId);
+            usuarioService.update(usuDTO);
+            return usuDTO;
         } else {
             // Crear nuevo usuario
-            Usuario newUser = createNewSocialUser(email, name, uid, providerId);
-            return usuarioRepository.save(newUser);
+            UsuarioDTO newUser = createNewSocialUser(email, name, uid, providerId);
+            usuarioService.save(newUser);
+            return newUser;
         }
     }
 
@@ -86,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Actualiza los IDs de proveedores sociales en un usuario existente
      */
-    private void updateSocialProviderIds(Usuario usuario, String uid, String providerId) {
+    private void updateSocialProviderIds(UsuarioDTO usuario, String uid, String providerId) {
         if ("google.com".equals(providerId) && (usuario.getGoogleId() == null || usuario.getGoogleId().isEmpty())) {
             usuario.setGoogleId(uid);
         } else if ("facebook.com".equals(providerId) && (usuario.getFacebookId() == null || usuario.getFacebookId().isEmpty())) {
@@ -97,23 +106,32 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Crea un nuevo usuario para autenticación social
      */
-    private Usuario createNewSocialUser(String email, String name, String uid, String providerId) {
-        Usuario newUser = new Usuario();
+    private UsuarioDTO createNewSocialUser(String email, String name, String uid, String providerId) {
+        UsuarioDTO newUser = new UsuarioDTO();
+        newUser.setId(UUID.randomUUID().toString());
         newUser.setEmail(email);
+
+        // Dividir el nombre completo en fragmentos
+        String[] nameParts = name != null ? name.split(" ") : new String[0];
         newUser.setNombre(name != null ? name : "Usuario");
+
+        // Asignar el nombre y apellido según los fragmentos disponibles
+        newUser.setNombre(nameParts.length > 0 ? nameParts[0] : "Usuario");
+        newUser.setApellido(nameParts.length > 1 ?
+                String.join(" ", nameParts.length > 2 ?
+                        new String[]{nameParts[nameParts.length - 2], nameParts[nameParts.length - 1]} :
+                        new String[]{nameParts[1]}) : "");
         
         // Establecer valores por defecto
-        newUser.setApellido("");
         newUser.setTelefono("");
-        newUser.setClave("");
-        newUser.setIdDistrito(  null); 
+        newUser.setPassword("");
+        newUser.setDistritoId(  null);
         newUser.setDireccion("");
         newUser.setGoogleId("");
         newUser.setFacebookId("");
-        newUser.setRol("CLIENTE");
-        newUser.setEstado("ACTIVO");
-        newUser.setCreatedBy(newUser);
-        newUser.setUpdateBy(newUser);
+        newUser.setRol("cliente");
+        newUser.setEstado("activo");
+        newUser.setCreatedBy(null);
 
         // Establecer el ID del proveedor según el tipo de autenticación
         if ("google.com".equals(providerId)) {
