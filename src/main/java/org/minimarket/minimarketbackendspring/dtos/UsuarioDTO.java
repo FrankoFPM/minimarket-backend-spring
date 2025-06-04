@@ -43,6 +43,10 @@ public class UsuarioDTO {
         this.updatedBy = updatedBy;
     }
 
+    public UsuarioDTO() {
+        // Constructor por defecto
+    }
+
     public String getId() {
         return id;
     }
