@@ -1,6 +1,5 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UsuarioDTO {
@@ -42,6 +41,10 @@ public class UsuarioDTO {
         this.estado = estado;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
+    }
+
+    public UsuarioDTO() {
+        // Constructor por defecto
     }
 
     public String getId() {
