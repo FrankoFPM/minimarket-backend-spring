@@ -1,12 +1,10 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
-import java.time.Instant;
-
 /**
  * DTO para la entidad Producto.
  */
 public class ProductoDTO {
-    private String id;
+    private String idProducto;
     private String nombre;
     private String descripcion;
     private double precio;
@@ -14,18 +12,21 @@ public class ProductoDTO {
     private String foto;
     private String estado;
     private Long idCategoria;
+    private String categoriaNombre;
     private Long idProveedor;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private String proveedorNombre;
+    private String createdAt;
+    private String updatedAt;
 
     // Constructor vacío
     public ProductoDTO() {
     }
 
     // Constructor con todos los campos
-    public ProductoDTO(String id, String nombre, String descripcion, double precio, Long stock, String foto,
-            String estado, Long idCategoria, Long idProveedor, Instant createdAt, Instant updatedAt) {
-        this.id = id;
+    public ProductoDTO(String idProducto, String nombre, String descripcion, double precio, Long stock, String foto,
+            String estado, Long idCategoria, String categoriaNombre, Long idProveedor, String proveedorNombre,
+            String createdAt, String updatedAt) {
+        this.idProducto = idProducto;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -33,18 +34,20 @@ public class ProductoDTO {
         this.foto = foto;
         this.estado = estado;
         this.idCategoria = idCategoria;
+        this.categoriaNombre = categoriaNombre;
         this.idProveedor = idProveedor;
+        this.proveedorNombre = proveedorNombre;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     // Getters y Setters
-    public String getId() {
-        return id;
+    public String getIdProducto() {
+        return idProducto;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIdProducto(String idProducto) {
+        this.idProducto = idProducto;
     }
 
     public String getNombre() {
@@ -103,6 +106,14 @@ public class ProductoDTO {
         this.idCategoria = idCategoria;
     }
 
+    public String getCategoriaNombre() {
+        return categoriaNombre;
+    }
+
+    public void setCategoriaNombre(String categoriaNombre) {
+        this.categoriaNombre = categoriaNombre;
+    }
+
     public Long getIdProveedor() {
         return idProveedor;
     }
@@ -111,20 +122,29 @@ public class ProductoDTO {
         this.idProveedor = idProveedor;
     }
 
-    public Instant getCreatedAt() {
+    public String getProveedorNombre() {
+        return proveedorNombre;
+    }
+
+    public void setProveedorNombre(String proveedorNombre) {
+        this.proveedorNombre = proveedorNombre;
+    }
+
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
+    
 
 }

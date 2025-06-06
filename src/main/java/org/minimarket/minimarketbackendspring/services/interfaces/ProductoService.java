@@ -1,6 +1,7 @@
 package org.minimarket.minimarketbackendspring.services.interfaces;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.minimarket.minimarketbackendspring.dtos.ProductoDTO;
 
@@ -30,7 +31,23 @@ public interface ProductoService {
      * @param nombre el nombre del producto
      * @return
      */
-    ProductoDTO findByNombre(String nombre);
+    Optional<ProductoDTO> findByNombre(String nombre);
+
+    /**
+     * Obtiene una lista de productos asociados a una categoría específica.
+     *
+     * @param idCategoria el identificador de la categoría
+     * @return una lista de objetos CategoriaDTO
+     */
+    List<ProductoDTO> findByCategoriaId(Long idCategoria);
+
+    /**
+     * Obtiene una lista de productos asociados a un proveedor específico.
+     *
+     * @param idProveedor el identificador del proveedor
+     * @return una lista de objetos ProveedorDTO
+     */
+    List<ProductoDTO> findByProveedorId(Long idProveedor);
 
     /**
      * Guarda un nuevo producto.
