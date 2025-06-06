@@ -41,6 +41,28 @@ public class ProductoController {
     }
 
     /**
+     * Obtiene una lista de productos asociados a una categoría específica.
+     *
+     * @param idCategoria el identificador de la categoría
+     * @return una lista de objetos CategoriaDTO
+     */
+    @GetMapping("/categoria/{idCategoria}")
+    public ResponseEntity<List<ProductoDTO>> getProductosByCategoria(@PathVariable Long idCategoria) {
+        return ResponseEntity.ok(productoService.findByCategoriaId(idCategoria));
+    }
+
+    /**
+     * Obtiene una lista de productos asociados a un proveedor específico.
+     *
+     * @param idProveedor el identificador del proveedor
+     * @return una lista de objetos ProveedorDTO
+     */
+    @GetMapping("/proveedor/{idProveedor}")
+    public ResponseEntity<List<ProductoDTO>> getProductosByProveedor(@PathVariable Long idProveedor) {
+        return ResponseEntity.ok(productoService.findByCategoriaId(idProveedor));
+    }
+
+    /**
      * Obtiene un producto por su ID.
      *
      * @param id el identificador del producto
@@ -52,13 +74,13 @@ public class ProductoController {
     }
 
     /**
-     * Busca un producto por su nombre.
+     * Busca un producto por su nombre
      *
      * @param nombre el nombre del producto
      * @return
      */
-    @GetMapping("/producto/{nombre}")
-    public ResponseEntity<ProductoDTO> getByNombre(@PathVariable String nombre) {
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<ProductoDTO> getProductoByNombre(@PathVariable String nombre) {
         return productoService.findByNombre(nombre)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -85,7 +107,7 @@ public class ProductoController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateProducto(@PathVariable String id, @RequestBody ProductoDTO producto) {
-        producto.setId(id);
+        producto.setIdProducto(id);
         productoService.update(producto);
         return ResponseEntity.ok().build();
     }

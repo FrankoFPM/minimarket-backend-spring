@@ -1,8 +1,6 @@
 package org.minimarket.minimarketbackendspring.services.impl;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.minimarket.minimarketbackendspring.dtos.ProveedorDTO;
@@ -24,129 +22,176 @@ public class ProveedorServiceImpl implements ProveedorService {
     private ProveedorRepository proveedorRepository;
 
     /**
-     * Convierte una entidad Proveedor a ProveedorDTO.
+     * Obtiene una lista de todos los proveedores
      *
-     * @param pv la entidad Proveedor
-     * @return 
-     */
-    public ProveedorDTO convertToDTO(Proveedor pv) {
-        return new ProveedorDTO(
-                pv.getIdProveedor(),
-                pv.getNombre(),
-                pv.getContacto(),
-                pv.getTelefono(),
-                pv.getDireccion(),
-                pv.getEmail(),
-                pv.getEstado(),
-                null, // createdBy (ajusta si tienes este dato en la entidad)
-                null  // updatedBy (ajusta si tienes este dato en la entidad)
-        );
-    }
-
-    /**
-     * Obtiene una lista de todos los proveedores.
-     *
-     * @return
+     * @return una lista de objetos de tipo Proveedor
      */
     @Override
     public List<ProveedorDTO> findAll() {
         List<Proveedor> proveedores = proveedorRepository.findAll();
 
         return proveedores.stream()
-                .map(this::convertToDTO)
+                .map(pv -> new ProveedorDTO(
+                        pv.getId(),
+                        pv.getNombre(),
+                        pv.getContacto(),
+                        pv.getTelefono(),
+                        pv.getDireccion(),
+                        pv.getEmail(),
+                        pv.getEstado(),
+                        pv.getCreatedBy(),
+                        pv.getUpdateBy(),
+                        pv.getCreatedAt(),
+                        pv.getUpdatedAt()
+                ))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Busca un proveedor por su ID.
+     * Busca un proveedor por su ID
      *
      * @param id el identificador del proveedor
-     * @return 
+     * @return el proveedor encontrado o null si no existe
      */
     @Override
-    public ProveedorDTO findById(String id) {
+    public ProveedorDTO findById(Long id) {
         return proveedorRepository.findById(id)
-                .map(this::convertToDTO)
+                .map(pv -> new ProveedorDTO(
+                        pv.getId(),
+                        pv.getNombre(),
+                        pv.getContacto(),
+                        pv.getTelefono(),
+                        pv.getDireccion(),
+                        pv.getEmail(),
+                        pv.getEstado(),
+                        pv.getCreatedBy(),
+                        pv.getUpdateBy(),
+                        pv.getCreatedAt(),
+                        pv.getUpdatedAt()
+                ))
                 .orElseThrow(() -> new EntityNotFoundException("Proveedor no encontrado con ID: " + id));
     }
 
     /**
-     * Busca un proveedor por su nombre.
+     * Busca un proveedor por su nombre
      *
-     * @param nombre el nombre del proveedor
-     * @return
+     * @param nombre el identificador del proveedor
+     * @return el proveedor encontrado o null si no existe
      */
     @Override
-    public Optional<ProveedorDTO> findByNombre(String nombre) {
+    public ProveedorDTO findByNombre(String nombre) {
         return proveedorRepository.findByNombre(nombre)
-                .map(this::convertToDTO);
+                .map(pv -> new ProveedorDTO(
+                        pv.getId(),
+                        pv.getNombre(),
+                        pv.getContacto(),
+                        pv.getTelefono(),
+                        pv.getDireccion(),
+                        pv.getEmail(),
+                        pv.getEstado(),
+                        pv.getCreatedBy(),
+                        pv.getUpdateBy(),
+                        pv.getCreatedAt(),
+                        pv.getUpdatedAt()
+                ))
+                .orElseThrow(() -> new EntityNotFoundException("Proveedor no encontrado con nombre: " + nombre));
     }
 
     /**
-     * Busca un proveedor por su email.
+     * Busca un proveedor por su email
      *
-     * @param email el email del proveedor
-     * @return
+     * @param email el identificador del proveedor
+     * @return el proveedor encontrado o null si no existe
      */
     @Override
-    public Optional<ProveedorDTO> findByEmail(String email) {
+    public ProveedorDTO findByEmail(String email) {
         return proveedorRepository.findByEmail(email)
-                .map(this::convertToDTO);
+                .map(pv -> new ProveedorDTO(
+                        pv.getId(),
+                        pv.getNombre(),
+                        pv.getContacto(),
+                        pv.getTelefono(),
+                        pv.getDireccion(),
+                        pv.getEmail(),
+                        pv.getEstado(),
+                        pv.getCreatedBy(),
+                        pv.getUpdateBy(),
+                        pv.getCreatedAt(),
+                        pv.getUpdatedAt()
+                ))
+                .orElseThrow(() -> new EntityNotFoundException("Proveedor no encontrado con email: " + email));
+    }
+
+    /**
+     * Obtiene una lista de todos los proveedores de un estado específico.
+     *
+     * @return una lista de objetos de tipo Proveedor
+     */
+    @Override
+    public List<ProveedorDTO> findByEstado(String estado) {
+        return proveedorRepository.findByEstado(estado).stream()
+                .map(pv -> new ProveedorDTO(
+                        pv.getId(),
+                        pv.getNombre(),
+                        pv.getContacto(),
+                        pv.getTelefono(),
+                        pv.getDireccion(),
+                        pv.getEmail(),
+                        pv.getEstado(),
+                        pv.getCreatedBy(),
+                        pv.getUpdateBy(),
+                        pv.getCreatedAt(),
+                        pv.getUpdatedAt()
+                        ))
+                .collect(Collectors.toList());
     }
 
     /**
      * Guarda un nuevo proveedor.
      *
-     * @param proveedor el objeto ProveedorDTO a guardar
+     * @param proveedor el objeto Proveedor a guardar
      */
     @Override
     public void save(ProveedorDTO proveedor) {
         Proveedor pv = new Proveedor();
-        
-        // Aqui se genera un ID único para nuevos proveedores
-        if (proveedor.getId() == null || proveedor.getId().isEmpty()) {
-            pv.setIdProveedor(UUID.randomUUID().toString());
-        } else {
-            pv.setIdProveedor(proveedor.getId());
-        }
-        
-        pv.setNombre(proveedor.getNombre());
-        pv.setContacto(proveedor.getContacto());
-        pv.setTelefono(proveedor.getTelefono());
-        pv.setDireccion(proveedor.getDireccion());
-        pv.setEmail(proveedor.getEmail());
-        pv.setEstado("activo"); 
-
-        proveedorRepository.save(pv);
-    }
-
-    /**
-     * Actualiza un proveedor existente.
-     *
-     * @param proveedor
-     */
-    @Override
-    public void update(ProveedorDTO proveedor) {
-        Proveedor pv = proveedorRepository.findById(proveedor.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + proveedor.getId()));
-
         pv.setNombre(proveedor.getNombre());
         pv.setContacto(proveedor.getContacto());
         pv.setTelefono(proveedor.getTelefono());
         pv.setDireccion(proveedor.getDireccion());
         pv.setEmail(proveedor.getEmail());
         pv.setEstado(proveedor.getEstado());
-
+        pv.setCreatedBy(proveedor.getCreatedBy());
+        pv.setUpdateBy(proveedor.getUpdatedBy());
         proveedorRepository.save(pv);
+    }
+
+    /**
+     * Actualiza un proveedor existente.
+     *
+     * @param proveedor el objeto Categoria a actualizar
+     */
+    @Override
+    public void update(ProveedorDTO proveedor) {
+        Proveedor prov = proveedorRepository.findById(proveedor.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Proveedor no encontrado con ID: " + proveedor.getId()));
+        prov.setNombre(proveedor.getNombre());
+        prov.setContacto(proveedor.getContacto());
+        prov.setTelefono(proveedor.getTelefono());
+        prov.setDireccion(proveedor.getDireccion());
+        prov.setEmail(proveedor.getEmail());
+        prov.setEstado(proveedor.getEstado());
+        //TODO: Validar el usuario que actualiza
+        prov.setUpdateBy(proveedor.getUpdatedBy());
+        proveedorRepository.save(prov);
     }
 
     /**
      * Elimina un proveedor por su ID.
      *
-     * @param id
+     * @param id el identificador de la categoria a eliminar
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         if (!proveedorRepository.existsById(id)) {
             throw new EntityNotFoundException("Proveedor no encontrado con ID: " + id);
         }

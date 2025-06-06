@@ -6,17 +6,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.minimarket.minimarketbackendspring.dtos.ProductoDTO;
-import org.minimarket.minimarketbackendspring.entities.Producto;
 import org.minimarket.minimarketbackendspring.entities.Categoria;
+import org.minimarket.minimarketbackendspring.entities.Producto;
 import org.minimarket.minimarketbackendspring.entities.Proveedor;
-import org.minimarket.minimarketbackendspring.repositories.ProductoRepository;
 import org.minimarket.minimarketbackendspring.repositories.CategoriaRepository;
+import org.minimarket.minimarketbackendspring.repositories.ProductoRepository;
 import org.minimarket.minimarketbackendspring.repositories.ProveedorRepository;
 import org.minimarket.minimarketbackendspring.services.interfaces.ProductoService;
-import org.minimarket.minimarketbackendspring.services.interfaces.CategoriaService;
-import org.minimarket.minimarketbackendspring.services.interfaces.ProveedorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -28,232 +25,199 @@ import jakarta.persistence.EntityNotFoundException;
 public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
-    private ProductoRepository usuarioRepository;
+    private ProductoRepository productoRepository;
 
     @Autowired
     private CategoriaRepository categoriaRepository;
-    @Autowired
-    private CategoriaService categoriaService;
 
     @Autowired
     private ProveedorRepository proveedorRepository;
-    @Autowired
-    private ProveedorService proveedorService;
 
     /**
      * Convierte una entidad Producto a ProductoDTO.
      *
      * @param p la entidad Producto
-     * @return 
+     * @return
      */
-    public ProductoDTO convertToDTO(Producto u) {
-        return new UsuarioDTO(
-                u.getIdUsuario(),
-                u.getNombre(),
-                u.getApellido(),
-                u.getEmail(),
-                u.getTelefono(),
-                u.getClave(),
-                u.getIdDistrito() != null ? u.getIdDistrito().getId() : null,
-                u.getIdDistrito() != null ? u.getIdDistrito().getNombre() : null,
-                u.getDireccion(),
-                u.getGoogleId(),
-                u.getFacebookId(),
-                u.getRol(),
-                u.getEstado(),
-                null, // createdBy (ajusta si tienes este dato en la entidad)
-                null  // updatedBy (ajusta si tienes este dato en la entidad)
+    public ProductoDTO convertToDTO(Producto p) {
+        return new ProductoDTO(
+                p.getIdProducto(),
+                p.getNombre(),
+                p.getDescripcion(),
+                p.getPrecio(),
+                p.getStock(),
+                p.getFoto(),
+                p.getEstado(),
+                p.getIdCategoria() != null ? p.getIdCategoria().getId() : null,
+                p.getIdCategoria() != null ? p.getIdCategoria().getNombre() : null,
+                p.getIdProveedor() != null ? p.getIdProveedor().getId() : null,
+                p.getIdProveedor() != null ? p.getIdProveedor().getNombre() : null,
+                null,
+                null
         );
+                
     }
 
     /**
-     * Obtiene una lista de todos los usuarios.
+     * Obtiene una lista de todos los productos.
      *
      * @return
      */
     @Override
-    public List<UsuarioDTO> findAll() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
+    public List<ProductoDTO> findAll() {
+        List<Producto> productos = productoRepository.findAll();
 
-        return usuarios.stream()
+        return productos.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Busca un usuario por su ID.
+     * Busca un producto por su ID.
      *
-     * @param id el identificador del usuario
-     * @return 
-     */
-    @Override
-    public UsuarioDTO findById(String id) {
-        return usuarioRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
-    }
-
-    /**
-     * Busca un usuario por su email.
-     *
-     * @param email el email del usuario
+     * @param id el identificador del producto
      * @return
      */
     @Override
-    public Optional<UsuarioDTO> findByEmail(String email) {
-        return usuarioRepository.findByEmail(email)
+    public ProductoDTO findById(String id) {
+        return productoRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado con ID: " + id));
+    }
+
+    /**
+     * Busca un producto por su nombre.
+     *
+     * @param nombre el nombre del producto
+     * @return
+     */
+    @Override
+    public Optional<ProductoDTO> findByNombre(String nombre) {
+        return productoRepository.findByNombre(nombre)
                 .map(this::convertToDTO);
     }
 
     /**
-     * Obtiene una lista de usuarios asociados a un distrito específico.
+     * Obtiene una lista de productos asociados a una categoría específica.
      *
-     * @param idDistrito el identificador del distrito
+     * @param idCategoria el identificador de la categoría
      * @return
      */
     @Override
-    public List<UsuarioDTO> findByDistritoId(Long idDistrito) {
-        return usuarioRepository.findByIdDistrito_Id(idDistrito).stream()
+    public List<ProductoDTO> findByCategoriaId(Long idCategoria) {
+        return productoRepository.findByIdCategoria_Id(idCategoria).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene una lista de productos asociados a un proveedor específico.
+     *
+     * @param idProveedor el identificador del proveedor
+     * @return
+     */
+    @Override
+    public List<ProductoDTO> findByProveedorId(Long idProveedor) {
+        return productoRepository.findByIdProveedor_Id(idProveedor).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Busca un usuario por su ID de Google.
+     * Guarda un nuevo producto.
      *
-     * @param googleId el ID de Google del usuario
-     * @return 
+     * @param producto el objeto ProductoDTO a guardar
      */
     @Override
-    public Optional<UsuarioDTO> findByGoogleId(String googleId) {
-        return usuarioRepository.findByGoogleId(googleId)
-                .map(this::convertToDTO);
-    }
+    public void save(ProductoDTO producto) {
+        Producto p = new Producto();
 
-    /**
-     * Busca un usuario por su ID de Facebook.
-     *
-     * @param facebookId el ID de Facebook del usuario
-     * @return
-     */
-    @Override
-    public Optional<UsuarioDTO> findByFacebookId(String facebookId) {
-        return usuarioRepository.findByFacebookId(facebookId)
-                .map(this::convertToDTO);
-    }
-
-    /**
-     * Encuentra usuarios por su rol.
-     *
-     * @param rol el rol del usuario (cliente, admin, etc.)
-     * @return
-     */
-    @Override
-    public List<UsuarioDTO> findByRol(String rol) {
-        return usuarioRepository.findByRol(rol).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    /*
-    insert into usuarios (nombre, apellido, email, clave, telefono, id_distrito, direccion, rol)
-    values ('Franco', 'PM','example@example.com','123456789','987654321',1,'Calle Falsa 123','admin');
-    * */
-
-    /**
-     * Guarda un nuevo usuario.
-     *
-     * @param usuario el objeto UsuarioDTO a guardar
-     */
-    @Override
-    public void save(UsuarioDTO usuario) {
-        Usuario u = new Usuario();
-        
-        // Aqui se genera un ID único para nuevos usuarios :D
-        if (usuario.getId() == null || usuario.getId().isEmpty()) {
-            u.setIdUsuario(UUID.randomUUID().toString());
+        // Aqui se genera un ID único para nuevos productos
+        if (producto.getIdProducto() == null || producto.getIdProducto().isEmpty()) {
+            p.setIdProducto(UUID.randomUUID().toString());
         } else {
-            u.setIdUsuario(usuario.getId());
+            p.setIdProducto(producto.getIdProducto());
         }
-        
-        u.setNombre(usuario.getNombre());
-        u.setApellido(usuario.getApellido());
-        u.setEmail(usuario.getEmail());
-        u.setClave(passwordEncoder.encode(usuario.getPassword()));
-        u.setTelefono(usuario.getTelefono());
 
-        if (usuario.getDistritoId() != null) {
-            Distrito distrito = distritoRepository.findById(usuario.getDistritoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getDistritoId()));
-            u.setIdDistrito(distrito);
+        p.setNombre(producto.getNombre());
+        p.setDescripcion(producto.getDescripcion());
+        p.setPrecio(producto.getPrecio());
+        p.setStock(producto.getStock());
+        p.setFoto(producto.getFoto());
+        p.setEstado("activo");
+
+        // Verifica si la categoría existe antes de asignarlo
+        if (producto.getIdCategoria() != null) {
+            Categoria categoria = categoriaRepository.findById(producto.getIdCategoria())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Categoría no encontrada con ID: " + producto.getIdCategoria()));
+            p.setIdCategoria(categoria);
         } else {
-            u.setIdDistrito(null);
+            p.setIdCategoria(null);
         }
 
-        u.setDireccion(usuario.getDireccion());
-        u.setRol(usuario.getRol() != null ? usuario.getRol() : "cliente");
-        u.setGoogleId(usuario.getGoogleId());
-        u.setFacebookId(usuario.getFacebookId());
-        u.setEstado("activo"); 
-
-        // Asignar distrito proporcionando ID
-        if (usuario.getDistritoId() != null) {
-            Distrito distrito = distritoRepository.findById(usuario.getDistritoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getDistritoId()));
-            u.setIdDistrito(distrito);
+        // Verifica si el proveedor existe antes de asignarlo
+        if (producto.getIdProveedor() != null) {
+            Proveedor proveedor = proveedorRepository.findById(producto.getIdProveedor())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Proveedor no encontrado con ID: " + producto.getIdProveedor()));
+            p.setIdProveedor(proveedor);
         }
 
-        usuarioRepository.save(u);
+        productoRepository.save(p);
     }
 
     /**
-     * Actualiza un usuario existente.
+     * Actualiza un producto existente.
      *
-     * @param usuario
+     * @param producto
      */
     @Override
-    public void update(UsuarioDTO usuario) {
-        Usuario u = usuarioRepository.findById(usuario.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + usuario.getId()));
+    public void update(ProductoDTO producto) {
+        Producto p = productoRepository.findById(producto.getIdProducto())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Producto no encontrado con ID: " + producto.getIdProducto()));
 
-        u.setNombre(usuario.getNombre());
-        u.setApellido(usuario.getApellido());
-        u.setEmail(usuario.getEmail());
-        
-        // Aqui actualiza la clave si se proporciona una nueva
-        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-            u.setClave(passwordEncoder.encode(usuario.getPassword()));
-        }
-        
-        u.setTelefono(usuario.getTelefono());
-        u.setDireccion(usuario.getDireccion());
-        u.setGoogleId(usuario.getGoogleId());
-        u.setFacebookId(usuario.getFacebookId());
-        u.setRol(usuario.getRol());
-        u.setEstado(usuario.getEstado());
+        p.setNombre(producto.getNombre());
+        p.setDescripcion(producto.getDescripcion());
+        p.setPrecio(producto.getPrecio());
+        p.setStock(producto.getStock());
+        p.setFoto(producto.getFoto());
+        p.setEstado(producto.getEstado());
 
-        // Actualizar distrito si se proporciona ID
-        if (usuario.getDistritoId() != null) {
-            Distrito distrito = distritoRepository.findById(usuario.getDistritoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Distrito no encontrado con ID: " + usuario.getDistritoId()));
-            u.setIdDistrito(distrito);
+        // Actualizar categoria si se proporciona ID
+        if (producto.getIdCategoria() != null) {
+            Categoria categoria = categoriaRepository.findById(producto.getIdCategoria())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Categoría no encontrada con ID: " + producto.getIdCategoria()));
+            p.setIdCategoria(categoria);
         } else {
-            u.setIdDistrito(null);
+            p.setIdCategoria(null);
         }
 
-        usuarioRepository.save(u);
+        // Actualizar proveedor si se proporciona ID
+        if (producto.getIdProveedor() != null) {
+            Proveedor proveedor = proveedorRepository.findById(producto.getIdProveedor())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Proveedor no encontrado con ID: " + producto.getIdProveedor()));
+            p.setIdProveedor(proveedor);
+        } else {
+            p.setIdProveedor(null);
+        }
+
+        productoRepository.save(p);
     }
 
     /**
-     * Elimina un usuario por su ID.
+     * Elimina un producto por su ID.
      *
      * @param id
      */
     @Override
     public void delete(String id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario no encontrado con ID: " + id);
+        if (!productoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Producto no encontrado con ID: " + id);
         }
-        usuarioRepository.deleteById(id);
+        productoRepository.deleteById(id);
     }
 }

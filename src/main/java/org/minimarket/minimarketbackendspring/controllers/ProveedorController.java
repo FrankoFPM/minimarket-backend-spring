@@ -29,87 +29,67 @@ public class ProveedorController {
     @Autowired
     private ProveedorService proveedorService;
 
-    /**
-     * Obtiene una lista de todos los proveedores.
-     *
-     * @return
-     */
     @GetMapping
     public ResponseEntity<List<ProveedorDTO>> getAllProveedores() {
         return ResponseEntity.ok(proveedorService.findAll());
+    }
+
+    @GetMapping("/proveedor/{estado}")
+    public ResponseEntity<List<ProveedorDTO>> getActiveProveedores(@PathVariable String estado) {
+        return ResponseEntity.ok(proveedorService.findByEstado(estado));
     }
 
     /**
      * Obtiene un proveedor por su ID.
      *
      * @param id el identificador del proveedor
-     * @return
+     * @return el proveedor encontrado o un error 404 si no existe
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProveedorDTO> getProveedorById(@PathVariable String id) {
+    public ResponseEntity<ProveedorDTO> getProveedorById(@PathVariable Long id) {
         return ResponseEntity.ok(proveedorService.findById(id));
+
     }
 
     /**
-     * Busca un proveedor por su nombre.
+     * Obtiene un proveedor por su nombre.
      *
      * @param nombre el nombre del proveedor
-     * @return
+     * @return el proveedor encontrado o un error 404 si no existe
      */
-    @GetMapping("/proveedor/{nombre}")
+    @GetMapping("/{nombre}")
     public ResponseEntity<ProveedorDTO> getProveedorByNombre(@PathVariable String nombre) {
-        return proveedorService.findByEmail(nombre)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(proveedorService.findByNombre(nombre));
+
     }
 
     /**
-     * Busca un proveedor por su email.
+     * Obtiene un proveedor por su email.
      *
      * @param email el email del proveedor
-     * @return
+     * @return el proveedor encontrado o un error 404 si no existe
      */
-    @GetMapping("/proveedor/{email}")
+    @GetMapping("/{email}")
     public ResponseEntity<ProveedorDTO> getProveedorByEmail(@PathVariable String email) {
-        return proveedorService.findByEmail(email)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(proveedorService.findByEmail(email));
+
     }
 
-    /**
-     * Crea un nuevo proveedor.
-     *
-     * @param proveedor el objeto ProveedorDTO a crear
-     * @return una respuesta HTTP 201 si se crea correctamente
-     */
     @PostMapping
     public ResponseEntity<Void> createProveedor(@RequestBody ProveedorDTO proveedor) {
         proveedorService.save(proveedor);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.ok().build();
     }
 
-    /**
-     * Actualiza un proveedor existente.
-     *
-     * @param id el identificador del proveedor a actualizar
-     * @param usuario el objeto ProveedoroDTO con los datos actualizados
-     * @return
-     */
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateProveedor(@PathVariable String id, @RequestBody ProveedorDTO proveedor) {
+    public ResponseEntity<Void> updateProveedor(@PathVariable Long id, @RequestBody ProveedorDTO proveedor) {
         proveedor.setId(id);
         proveedorService.update(proveedor);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * Elimina un proveedor por su ID.
-     *
-     * @param id el identificador del proveedor a eliminar
-     * @return
-     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProveedor(@PathVariable String id) {
+    public ResponseEntity<Void> deleteProveedor(@PathVariable Long id) {
         proveedorService.delete(id);
         return ResponseEntity.ok().build();
     }

@@ -1,19 +1,19 @@
 package org.minimarket.minimarketbackendspring.entities;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -22,11 +22,11 @@ import jakarta.persistence.Table;
 public class Proveedor {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROVEEDOR_id_gen")
-    @SequenceGenerator(name = "PROVEEDOR_id_gen", sequenceName = "ISEQ$$_76643", allocationSize = 1)
+    @SequenceGenerator(name = "PROVEEDOR_id_gen", sequenceName = "proveedor_seq", allocationSize = 1)
     @Column(name = "ID_PROVEEDOR", nullable = false)
-    private String idProveedor;
+    private Long id;
 
-    @Column(name = "PROVEEDOR", nullable = false, length = 100)
+    @Column(name = "NOMBRE", nullable = false, length = 100)
     private String nombre;
 
     @Column(name = "CONTACTO", nullable = false, length = 100)
@@ -45,30 +45,28 @@ public class Proveedor {
     @Column(name = "ESTADO", nullable = false, length = 10)
     private String estado;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "CREATED_AT")
+    @Column(name = "CREATED_AT", updatable = false, insertable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
     private Instant createdAt;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "UPDATED_AT")
+    @Column(name = "UPDATED_AT", insertable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "CREATED_BY")
-    private org.minimarket.minimarketbackendspring.entities.Usuario createdBy;
+    @Column(name = "CREATED_BY", length = 36)
+    private String createdBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "UPDATE_BY")
-    private org.minimarket.minimarketbackendspring.entities.Usuario updateBy;
+    @Column(name = "UPDATE_BY", length = 36)
+    private String updateBy;
 
-    public String getIdProveedor() {
-        return idProveedor;
+    @OneToMany(mappedBy = "idProveedor")
+    @JsonManagedReference
+    private Set<org.minimarket.minimarketbackendspring.entities.Producto> productos = new LinkedHashSet<>();
+
+    public Long getId() {
+        return id;
     }
 
-    public void setIdProveedor(String idProveedor) {
-        this.idProveedor = idProveedor;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -135,20 +133,28 @@ public class Proveedor {
         this.updatedAt = updatedAt;
     }
 
-    public org.minimarket.minimarketbackendspring.entities.Usuario getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(org.minimarket.minimarketbackendspring.entities.Usuario createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public org.minimarket.minimarketbackendspring.entities.Usuario getUpdateBy() {
+    public String getUpdateBy() {
         return updateBy;
     }
 
-    public void setUpdateBy(org.minimarket.minimarketbackendspring.entities.Usuario updateBy) {
+    public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
+    }
+
+    public Set<org.minimarket.minimarketbackendspring.entities.Producto> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(Set<org.minimarket.minimarketbackendspring.entities.Producto> productos) {
+        this.productos = productos;
     }
 
 }

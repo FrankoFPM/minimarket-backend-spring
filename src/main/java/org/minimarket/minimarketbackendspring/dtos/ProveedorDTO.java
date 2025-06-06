@@ -6,13 +6,15 @@ import java.time.Instant;
  * DTO para la entidad Proveedor.
  */
 public class ProveedorDTO {
-    private String id;
+    private Long id;
     private String nombre;
     private String contacto;
     private String telefono;
     private String direccion;
     private String email;
     private String estado;
+    private String createdBy;
+    private String updatedBy;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -21,8 +23,8 @@ public class ProveedorDTO {
     }
 
     // Constructor con todos los elementos
-    public ProveedorDTO(String id, String nombre, String contacto, String telefono, String direccion, String email,
-            String estado, Instant createdAt, Instant updatedAt) {
+    public ProveedorDTO(Long id, String nombre, String contacto, String telefono, String direccion, String email,
+            String estado, String createdBy, String updatedBy, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.nombre = nombre;
         this.contacto = contacto;
@@ -30,16 +32,17 @@ public class ProveedorDTO {
         this.direccion = direccion;
         this.email = email;
         this.estado = estado;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // Getters y Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -91,6 +94,22 @@ public class ProveedorDTO {
         this.estado = estado;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -106,5 +125,8 @@ public class ProveedorDTO {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    // Getters y Setters
+    
 
 }

@@ -67,7 +67,7 @@ public class CategoriaServiceImpl implements CategoriaService {
                         d.getCreatedAt(),
                         d.getUpdatedAt()
                 ))
-                .orElseThrow(() -> new EntityNotFoundException("Categoría no encontrado con ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada con ID: " + id));
     }
 
     /**
@@ -78,15 +78,15 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     public List<CategoriaDTO> findByEstado(String estado) {
         return categoriaRepository.findByEstado(estado).stream()
-                .map(d -> new CategoriaDTO(
-                        d.getId(),
-                        d.getNombre(),
-                        d.getDescripcion(),
-                        d.getEstado(),
-                        d.getCreatedBy(),
-                        d.getUpdateBy(),
-                        d.getCreatedAt(),
-                        d.getUpdatedAt()))
+                .map(cat -> new CategoriaDTO(
+                        cat.getId(),
+                        cat.getNombre(),
+                        cat.getDescripcion(),
+                        cat.getEstado(),
+                        cat.getCreatedBy(),
+                        cat.getUpdateBy(),
+                        cat.getCreatedAt(),
+                        cat.getUpdatedAt()))
                 .collect(Collectors.toList());
     }
 
@@ -97,13 +97,13 @@ public class CategoriaServiceImpl implements CategoriaService {
      */
     @Override
     public void save(CategoriaDTO categoria) {
-        Categoria c = new Categoria();
-        c.setNombre(categoria.getNombre());
-        c.setDescripcion(categoria.getDescripcion());
-        c.setEstado(categoria.getEstado());
-        c.setCreatedBy(categoria.getCreatedBy());
-        c.setUpdateBy(categoria.getUpdatedBy());
-        categoriaRepository.save(c);
+        Categoria cat = new Categoria();
+        cat.setNombre(categoria.getNombre());
+        cat.setDescripcion(categoria.getDescripcion());
+        cat.setEstado(categoria.getEstado());
+        cat.setCreatedBy(categoria.getCreatedBy());
+        cat.setUpdateBy(categoria.getUpdatedBy());
+        categoriaRepository.save(cat);
     }
 
     /**

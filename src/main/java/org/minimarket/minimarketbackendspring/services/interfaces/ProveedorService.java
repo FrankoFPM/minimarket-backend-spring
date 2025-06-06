@@ -1,7 +1,6 @@
 package org.minimarket.minimarketbackendspring.services.interfaces;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.minimarket.minimarketbackendspring.dtos.ProveedorDTO;
 
@@ -23,7 +22,7 @@ public interface ProveedorService {
      * @param id el identificador del proveedor
      * @return
      */
-    ProveedorDTO findById(String id);
+    ProveedorDTO findById(Long id);
 
     /**
      * Busca un proveedor por su nombre.
@@ -31,7 +30,7 @@ public interface ProveedorService {
      * @param nombre el nombre del proveedor
      * @return
      */
-    Optional<ProveedorDTO> findByNombre(String nombre);
+    ProveedorDTO findByNombre(String nombre);
 
     /**
      * Busca un proveedor por su email.
@@ -39,26 +38,35 @@ public interface ProveedorService {
      * @param email el email del proveedor
      * @return
      */
-    Optional<ProveedorDTO> findByEmail(String email);
+    ProveedorDTO findByEmail(String email);
 
     /**
-     * Guarda un nuevo proveedor.
+     * Obtiene una lista de todos los proveedores activos.
      *
-     * @param proveedor
+     * @return una lista de objetos de tipo Proveedor
+     */
+    List<ProveedorDTO> findByEstado(String estado);
+
+    /**
+     * Guarda un nuevo proveedor en la base de datos.
+     *
+     * @param proveedor el objeto ProveedorDTO que contiene los datos del proveedor a guardar
+     * @throws IllegalArgumentException si los datos del proveedor no son válidos
      */
     void save(ProveedorDTO proveedor);
 
     /**
-     * Actualiza un proveedor existente.
+     * Actualiza un proveedor existente en la base de datos.
      *
-     * @param proveedor
+     * @param proveedor el objeto ProveedorDTO que contiene los datos actualizados del proveedor
+     * @throws jakarta.persistence.EntityNotFoundException si el proveedor con el ID especificado no existe
      */
     void update(ProveedorDTO proveedor);
 
     /**
      * Elimina un proveedor por su ID.
      *
-     * @param id
+     * @param id el identificador del proveedor a eliminar
      */
-    void delete(String id);
+    void delete(Long id);
 }
