@@ -34,7 +34,7 @@ public class Categoria {
     @Column(name = "DESCRIPCION")
     private String descripcion;
 
-    @ColumnDefault("'Activo'")
+    @ColumnDefault("'activo'")
     @Column(name = "ESTADO", nullable = false, length = 10)
     private String estado;
 
@@ -125,6 +125,5 @@ public class Categoria {
     public void setProductos(Set<org.minimarket.minimarketbackendspring.entities.Producto> productos) {
         this.productos = productos;
     }
-        
 
 }
