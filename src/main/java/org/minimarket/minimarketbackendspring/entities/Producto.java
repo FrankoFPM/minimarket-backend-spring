@@ -15,6 +15,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.Table;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "PRODUCTOS")
@@ -55,10 +56,12 @@ public class Producto {
     private String estado;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "CREATED_AT")
+    @UpdateTimestamp
+    @Column(name = "CREATED_AT", updatable = false)
     private OffsetDateTime createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private OffsetDateTime updatedAt;
 
