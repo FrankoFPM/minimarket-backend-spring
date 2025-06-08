@@ -1,5 +1,7 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * DTO para la entidad Producto.
  */
@@ -7,25 +9,34 @@ public class ProductoDTO {
     private String idProducto;
     private String nombre;
     private String descripcion;
-    private double precio;
+    private Double precio;
     private Long stock;
     private String foto;
     private String estado;
-    private Long idCategoria;
-    private String categoriaNombre;
-    private Long idProveedor;
-    private String proveedorNombre;
+    private String categoriaNombre;   // Solo el nombre de la categoría
+    private String proveedorNombre;   // Solo el nombre del proveedor
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String createdAt;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String updatedAt;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String createdBy;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String updateBy;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Long idCategoria;      // <--- ID para inserción
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Long idProveedor;      // <--- ID para inserción
 
     // Constructor vacío
     public ProductoDTO() {
     }
 
     // Constructor con todos los campos
-    public ProductoDTO(String idProducto, String nombre, String descripcion, double precio, Long stock, String foto,
-            String estado, Long idCategoria, String categoriaNombre, Long idProveedor, String proveedorNombre,
-            String createdAt, String updatedAt) {
+
+
+    public ProductoDTO(String idProducto, String nombre, String descripcion, Double precio, Long stock, String foto, String estado, String categoriaNombre, String proveedorNombre, String createdAt, String updatedAt, String createdBy, String updateBy, Long idCategoria, Long idProveedor) {
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -33,12 +44,14 @@ public class ProductoDTO {
         this.stock = stock;
         this.foto = foto;
         this.estado = estado;
-        this.idCategoria = idCategoria;
         this.categoriaNombre = categoriaNombre;
-        this.idProveedor = idProveedor;
         this.proveedorNombre = proveedorNombre;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.createdBy = createdBy;
+        this.updateBy = updateBy;
+        this.idCategoria = idCategoria;
+        this.idProveedor = idProveedor;
     }
 
     // Getters y Setters
@@ -66,11 +79,11 @@ public class ProductoDTO {
         this.descripcion = descripcion;
     }
 
-    public double getPrecio() {
+    public Double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio(Double precio) {
         this.precio = precio;
     }
 
@@ -98,28 +111,12 @@ public class ProductoDTO {
         this.estado = estado;
     }
 
-    public Long getIdCategoria() {
-        return idCategoria;
-    }
-
-    public void setIdCategoria(Long idCategoria) {
-        this.idCategoria = idCategoria;
-    }
-
     public String getCategoriaNombre() {
         return categoriaNombre;
     }
 
     public void setCategoriaNombre(String categoriaNombre) {
         this.categoriaNombre = categoriaNombre;
-    }
-
-    public Long getIdProveedor() {
-        return idProveedor;
-    }
-
-    public void setIdProveedor(Long idProveedor) {
-        this.idProveedor = idProveedor;
     }
 
     public String getProveedorNombre() {
@@ -145,6 +142,36 @@ public class ProductoDTO {
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
+
+    public Long getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(Long idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public Long getIdProveedor() {
+        return idProveedor;
+    }
+
+    public void setIdProveedor(Long idProveedor) {
+        this.idProveedor = idProveedor;
+    }
 }

@@ -1,30 +1,25 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
+import java.time.OffsetDateTime;
 
 /**
  * DTO para la entidad Proveedor.
  */
 public class ProveedorDTO {
-    private Long id;
-    private String nombre;
-    private String contacto;
-    private String telefono;
-    private String direccion;
-    private String email;
-    private String estado;
-    private String createdBy;
-    private String updatedBy;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private final Long id;
+    private final String nombre;
+    private final String contacto;
+    private final String telefono;
+    private final String direccion;
+    private final String email;
+    private final String estado;
+    private final OffsetDateTime createdAt;
+    private final OffsetDateTime updatedAt;
 
-    // Constructor vacío
-    public ProveedorDTO() {
-    }
-
-    // Constructor con todos los elementos
-    public ProveedorDTO(Long id, String nombre, String contacto, String telefono, String direccion, String email,
-            String estado, String createdBy, String updatedBy, Instant createdAt, Instant updatedAt) {
+    public ProveedorDTO(Long id, String nombre, String contacto, String telefono, String direccion, String email, String estado, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.nombre = nombre;
         this.contacto = contacto;
@@ -32,8 +27,6 @@ public class ProveedorDTO {
         this.direccion = direccion;
         this.email = email;
         this.estado = estado;
-        this.createdBy = createdBy;
-        this.updatedBy = updatedBy;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -42,91 +35,51 @@ public class ProveedorDTO {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getNombre() {
         return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getContacto() {
         return contacto;
     }
 
-    public void setContacto(String contacto) {
-        this.contacto = contacto;
-    }
-
     public String getTelefono() {
         return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
     }
 
     public String getDireccion() {
         return direccion;
     }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Instant getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "nombre = " + nombre + ", " +
+                "contacto = " + contacto + ", " +
+                "telefono = " + telefono + ", " +
+                "direccion = " + direccion + ", " +
+                "email = " + email + ", " +
+                "estado = " + estado + ", " +
+                "createdAt = " + createdAt + ", " +
+                "updatedAt = " + updatedAt + ", ";
     }
-
-    // Getters y Setters
     
 
 }

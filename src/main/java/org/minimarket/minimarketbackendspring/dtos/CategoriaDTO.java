@@ -1,6 +1,8 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
 
 public class CategoriaDTO {
@@ -9,7 +11,9 @@ public class CategoriaDTO {
     private String nombre;
     private String descripcion;
     private String estado;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String createdBy;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String updatedBy;
     private Instant createdAt;
     private Instant updatedAt;

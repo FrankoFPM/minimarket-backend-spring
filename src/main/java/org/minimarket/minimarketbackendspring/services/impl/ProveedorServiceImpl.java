@@ -39,8 +39,6 @@ public class ProveedorServiceImpl implements ProveedorService {
                         pv.getDireccion(),
                         pv.getEmail(),
                         pv.getEstado(),
-                        pv.getCreatedBy(),
-                        pv.getUpdateBy(),
                         pv.getCreatedAt(),
                         pv.getUpdatedAt()
                 ))
@@ -64,8 +62,6 @@ public class ProveedorServiceImpl implements ProveedorService {
                         pv.getDireccion(),
                         pv.getEmail(),
                         pv.getEstado(),
-                        pv.getCreatedBy(),
-                        pv.getUpdateBy(),
                         pv.getCreatedAt(),
                         pv.getUpdatedAt()
                 ))
@@ -89,8 +85,6 @@ public class ProveedorServiceImpl implements ProveedorService {
                         pv.getDireccion(),
                         pv.getEmail(),
                         pv.getEstado(),
-                        pv.getCreatedBy(),
-                        pv.getUpdateBy(),
                         pv.getCreatedAt(),
                         pv.getUpdatedAt()
                 ))
@@ -114,8 +108,6 @@ public class ProveedorServiceImpl implements ProveedorService {
                         pv.getDireccion(),
                         pv.getEmail(),
                         pv.getEstado(),
-                        pv.getCreatedBy(),
-                        pv.getUpdateBy(),
                         pv.getCreatedAt(),
                         pv.getUpdatedAt()
                 ))
@@ -138,8 +130,6 @@ public class ProveedorServiceImpl implements ProveedorService {
                         pv.getDireccion(),
                         pv.getEmail(),
                         pv.getEstado(),
-                        pv.getCreatedBy(),
-                        pv.getUpdateBy(),
                         pv.getCreatedAt(),
                         pv.getUpdatedAt()
                         ))
@@ -160,8 +150,9 @@ public class ProveedorServiceImpl implements ProveedorService {
         pv.setDireccion(proveedor.getDireccion());
         pv.setEmail(proveedor.getEmail());
         pv.setEstado(proveedor.getEstado());
-        pv.setCreatedBy(proveedor.getCreatedBy());
-        pv.setUpdateBy(proveedor.getUpdatedBy());
+        //TODO: Validar el usuario que crea
+        //pv.setCreatedBy(proveedor.getCreatedBy());
+        //pv.setUpdateBy(proveedor.getUpdatedBy());
         proveedorRepository.save(pv);
     }
 
@@ -181,7 +172,7 @@ public class ProveedorServiceImpl implements ProveedorService {
         prov.setEmail(proveedor.getEmail());
         prov.setEstado(proveedor.getEstado());
         //TODO: Validar el usuario que actualiza
-        prov.setUpdateBy(proveedor.getUpdatedBy());
+        //prov.setUpdateBy(proveedor.getUpdatedBy());
         proveedorRepository.save(prov);
     }
 

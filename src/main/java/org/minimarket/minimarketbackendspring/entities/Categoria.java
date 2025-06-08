@@ -19,7 +19,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "CATEGORIA")
+@Table(name = "CATEGORIAs")
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CATEGORIA_id_gen")
@@ -52,7 +52,7 @@ public class Categoria {
 
     @OneToMany(mappedBy = "idCategoria")
     @JsonManagedReference
-    private Set<org.minimarket.minimarketbackendspring.entities.Producto> productos = new LinkedHashSet<>();
+    private Set<Producto> productos = new LinkedHashSet<>();
 
     public Long getId() {
         return id;

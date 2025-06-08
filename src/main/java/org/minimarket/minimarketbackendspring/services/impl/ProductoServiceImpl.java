@@ -48,14 +48,15 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getStock(),
                 p.getFoto(),
                 p.getEstado(),
-                p.getIdCategoria() != null ? p.getIdCategoria().getId() : null,
                 p.getIdCategoria() != null ? p.getIdCategoria().getNombre() : null,
-                p.getIdProveedor() != null ? p.getIdProveedor().getId() : null,
                 p.getIdProveedor() != null ? p.getIdProveedor().getNombre() : null,
-                null,
-                null
+                p.getCreatedAt() != null ? p.getCreatedAt().toString() : null,
+                p.getUpdatedAt() != null ? p.getUpdatedAt().toString() : null,
+                p.getCreatedBy() != null ? p.getCreatedBy().getIdUsuario() : null,
+                p.getUpdateBy() != null ? p.getUpdateBy().getIdUsuario() : null,
+                p.getIdCategoria() != null ? p.getIdCategoria().getId() : null, // ID para inserción
+                p.getIdProveedor() != null ? p.getIdProveedor().getId() : null // ID para inserción
         );
-                
     }
 
     /**
