@@ -2,9 +2,7 @@ package org.minimarket.minimarketbackendspring.entities;
 
 import java.time.OffsetDateTime;
 
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +13,6 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.Table;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "PRODUCTOS")
@@ -56,7 +53,7 @@ public class Producto {
     private String estado;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @UpdateTimestamp
+    @CreationTimestamp
     @Column(name = "CREATED_AT", updatable = false)
     private OffsetDateTime createdAt;
 
