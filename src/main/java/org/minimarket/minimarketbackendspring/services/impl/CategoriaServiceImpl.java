@@ -130,9 +130,9 @@ public class CategoriaServiceImpl implements CategoriaService {
      */
     @Override
     public void delete(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Categoría no encontrada con ID: " + id);
-        }
-        categoriaRepository.deleteById(id);
+        Categoria cat = categoriaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada con ID: " + id));
+        cat.setEstado("inactivo");
+        categoriaRepository.save(cat);
     }
 }
