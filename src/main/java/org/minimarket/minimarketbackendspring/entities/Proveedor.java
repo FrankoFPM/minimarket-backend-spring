@@ -42,7 +42,7 @@ public class Proveedor {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @UpdateTimestamp
-    @Column(name = "CREATED_AT")
+    @Column(name = "CREATED_AT", updatable = false)
     private OffsetDateTime createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
