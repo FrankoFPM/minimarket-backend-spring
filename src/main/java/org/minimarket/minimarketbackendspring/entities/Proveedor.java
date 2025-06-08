@@ -11,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "PROVEEDOR")
@@ -40,10 +41,12 @@ public class Proveedor {
     private String estado;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     @Column(name = "CREATED_AT")
     private OffsetDateTime createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private OffsetDateTime updatedAt;
 
