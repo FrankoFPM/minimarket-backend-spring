@@ -183,9 +183,9 @@ public class ProveedorServiceImpl implements ProveedorService {
      */
     @Override
     public void delete(Long id) {
-        if (!proveedorRepository.existsById(id)) {
-            throw new EntityNotFoundException("Proveedor no encontrado con ID: " + id);
-        }
-        proveedorRepository.deleteById(id);
+        Proveedor proveedor = proveedorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Proveedor no encontrado con ID: " + id));
+        proveedor.setEstado("inactivo");
+        proveedorRepository.save(proveedor);
     }
 }
