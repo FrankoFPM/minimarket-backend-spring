@@ -216,9 +216,9 @@ public class ProductoServiceImpl implements ProductoService {
      */
     @Override
     public void delete(String id) {
-        if (!productoRepository.existsById(id)) {
-            throw new EntityNotFoundException("Producto no encontrado con ID: " + id);
-        }
-        productoRepository.deleteById(id);
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado con ID: " + id));
+        producto.setEstado("inactivo");
+        productoRepository.save(producto);
     }
 }

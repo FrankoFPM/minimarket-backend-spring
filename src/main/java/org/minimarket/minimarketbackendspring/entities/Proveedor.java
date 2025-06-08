@@ -6,11 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "PROVEEDOR")
@@ -40,10 +39,12 @@ public class Proveedor {
     private String estado;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "CREATED_AT")
+    @CreationTimestamp
+    @Column(name = "CREATED_AT", updatable = false)
     private OffsetDateTime createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private OffsetDateTime updatedAt;
 
