@@ -1,6 +1,7 @@
 package org.minimarket.minimarketbackendspring.services.interfaces;
 
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
+import org.minimarket.minimarketbackendspring.entities.Usuario;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,4 +86,6 @@ public interface UsuarioService {
      * @param id
      */
     void delete(String id);
+
+    List<UsuarioDTO> findByRolNot(String rol);
 }

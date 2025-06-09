@@ -52,4 +52,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
      * @return 
      */
     List<Usuario> findByRol(String rol);
+
+    /**
+     * Encuentra usuarios con roles distintos al especificado.
+     *
+     * @param rol el rol a excluir
+     * @return lista de usuarios con roles distintos al especificado
+     */
+    List<Usuario> findByRolNot(String rol);
 }
