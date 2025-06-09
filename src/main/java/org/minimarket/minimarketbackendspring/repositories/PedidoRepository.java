@@ -18,16 +18,16 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     Page<Pedido> findByEstado(String estado, Pageable pageable);
     Page<Pedido> findByMetodoPago(String metodoPago, Pageable pageable);
     Page<Pedido> findByFechaPedidoBetween(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, Pageable pageable);
-    Page<Pedido> findByEstadoAndIdUsuario_IdUsuario(String estado, String idUsuario, Pageable pageable);
+    Page<Pedido> findByEstadoAndIdUsuarioIdUsuario(String estado, String idUsuario, Pageable pageable);
     Page<Pedido> findByTotalGreaterThan(BigDecimal total, Pageable pageable);
     Page<Pedido> findByTotalBetween(BigDecimal minTotal, BigDecimal maxTotal, Pageable pageable);
     
     // Métodos sin paginación (solo para casos específicos)
-    List<Pedido> findByIdUsuario_IdUsuario(String idUsuario);
+    List<Pedido> findByIdUsuarioIdUsuario(String idUsuario);
     List<Pedido> findByEstado(String estado);
     List<Pedido> findByMetodoPago(String metodoPago);
     List<Pedido> findByFechaPedidoBetween(OffsetDateTime fechaInicio, OffsetDateTime fechaFin);
-    List<Pedido> findByEstadoAndIdUsuario_IdUsuario(String estado, String idUsuario);
+    List<Pedido> findByEstadoAndIdUsuarioIdUsuario(String estado, String idUsuario);
     List<Pedido> findByTotalGreaterThan(BigDecimal total);
     List<Pedido> findByTotalBetween(BigDecimal minTotal, BigDecimal maxTotal);
     

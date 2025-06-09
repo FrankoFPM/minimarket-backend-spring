@@ -143,7 +143,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + idUsuario);
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByIdUsuario_IdUsuario(idUsuario);
+        List<Pedido> pedidos = pedidoRepository.findByIdUsuarioIdUsuario(idUsuario);
         return convertToDTOList(pedidos);
     }
 
@@ -161,7 +161,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + idUsuario);
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndIdUsuario_IdUsuario(estado, idUsuario);
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndIdUsuarioIdUsuario(estado, idUsuario);
         return convertToDTOList(pedidos);
     }
 
