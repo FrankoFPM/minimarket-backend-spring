@@ -327,7 +327,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
      * Convierte entidad CarritoTemporal a DTO.
      */
     private CarritoTemporalDto convertToDTO(CarritoTemporal item) {
-        return new CarritoTemporalDto( // ✅ CORREGIDO
+        return new CarritoTemporalDto(
                 item.getId(),
                 item.getIdUsuario() != null ? item.getIdUsuario().getIdUsuario() : null,
                 item.getIdProducto() != null ? item.getIdProducto().getIdProducto() : null,
