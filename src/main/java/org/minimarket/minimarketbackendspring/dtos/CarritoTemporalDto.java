@@ -8,8 +8,8 @@ import java.time.Instant;
  */
 public class CarritoTemporalDto implements Serializable {
     private Long id;
-    private String idUsuarioIdUsuario;
-    private String idProductoIdProducto;
+    private String idUsuario;
+    private String idProducto;
     private String idProductoNombre;
     private Double idProductoPrecio;
     private Long cantidad;
@@ -20,8 +20,8 @@ public class CarritoTemporalDto implements Serializable {
 
     public CarritoTemporalDto(Long id, String idUsuarioIdUsuario, String idProductoIdProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, Instant fechaAgregado) {
         this.id = id;
-        this.idUsuarioIdUsuario = idUsuarioIdUsuario;
-        this.idProductoIdProducto = idProductoIdProducto;
+        this.idUsuario = idUsuarioIdUsuario;
+        this.idProducto = idProductoIdProducto;
         this.idProductoNombre = idProductoNombre;
         this.idProductoPrecio = idProductoPrecio;
         this.cantidad = cantidad;
@@ -37,19 +37,19 @@ public class CarritoTemporalDto implements Serializable {
     }
 
     public String getIdUsuarioIdUsuario() {
-        return idUsuarioIdUsuario;
+        return idUsuario;
     }
 
     public void setIdUsuarioIdUsuario(String idUsuarioIdUsuario) {
-        this.idUsuarioIdUsuario = idUsuarioIdUsuario;
+        this.idUsuario = idUsuarioIdUsuario;
     }
 
     public String getIdProductoIdProducto() {
-        return idProductoIdProducto;
+        return idProducto;
     }
 
     public void setIdProductoIdProducto(String idProductoIdProducto) {
-        this.idProductoIdProducto = idProductoIdProducto;
+        this.idProducto = idProductoIdProducto;
     }
 
     public String getIdProductoNombre() {
@@ -88,8 +88,8 @@ public class CarritoTemporalDto implements Serializable {
     public String toString() {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
-                "idUsuarioIdUsuario = " + idUsuarioIdUsuario + ", " +
-                "idProductoIdProducto = " + idProductoIdProducto + ", " +
+                "idUsuarioIdUsuario = " + idUsuario + ", " +
+                "idProductoIdProducto = " + idProducto + ", " +
                 "idProductoNombre = " + idProductoNombre + ", " +
                 "idProductoPrecio = " + idProductoPrecio + ", " +
                 "cantidad = " + cantidad + ", " +
