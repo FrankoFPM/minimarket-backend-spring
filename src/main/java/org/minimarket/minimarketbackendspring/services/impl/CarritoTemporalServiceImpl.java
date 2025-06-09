@@ -1,5 +1,7 @@
 package org.minimarket.minimarketbackendspring.services.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +14,7 @@ import org.minimarket.minimarketbackendspring.repositories.CarritoTemporalReposi
 import org.minimarket.minimarketbackendspring.repositories.ProductoRepository;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
 import org.minimarket.minimarketbackendspring.services.interfaces.CarritoTemporalService;
+import org.minimarket.minimarketbackendspring.services.interfaces.DescuentoPromocionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +40,9 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    @Autowired
+    private DescuentoPromocionService descuentoService;
+
     /**
      * Obtiene todos los items del carrito temporal.
      */
@@ -56,6 +62,60 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
         CarritoTemporal item = carritoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item de carrito no encontrado con ID: " + id));
         return convertToDTO(item);
+    }
+
+
+    /**
+     * Calcula el total del carrito aplicando descuentos disponibles.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal calcularTotalCarritoConDescuentos(String idUsuario) {
+        List<CarritoTemporalDto> items = findByUsuario(idUsuario);
+        
+        return items.stream()
+                .map(item -> {
+                    // Precio original del producto
+                    BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
+                    BigDecimal cantidad = BigDecimal.valueOf(item.getCantidad());
+                    
+                    // Aplicar descuentos si existen
+                    BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
+                            item.getIdProductoIdProducto(), precioOriginal);
+                    
+                    return precioConDescuento.multiply(cantidad);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+
+    /**
+     * Obtiene items del carrito con información de descuentos aplicados.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<CarritoTemporalDto> findByUsuarioConDescuentos(String idUsuario) {
+        List<CarritoTemporalDto> items = findByUsuario(idUsuario);
+        
+        // Enriquecer cada item con información de descuentos
+        return items.stream()
+                .map(item -> {
+                    // Verificar si tiene descuentos activos
+                    boolean tieneDescuento = descuentoService.tieneDescuentosActivos(item.getIdProductoIdProducto());
+                    
+                    if (tieneDescuento) {
+                        BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
+                        BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
+                                item.getIdProductoIdProducto(), precioOriginal);
+                        
+                        // Aquí podrías crear un CarritoTemporalConDescuentoDto si quieres más detalle
+                        // Por ahora mantenemos el DTO original
+                    }
+                    
+                    return item;
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -94,8 +154,6 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     public CarritoTemporalDto update(Long id, CarritoTemporalDto carritoDTO) {
         CarritoTemporal existingItem = carritoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item de carrito no encontrado con ID: " + id));
-
-        // Solo actualizar cantidad si es válida
         if (carritoDTO.getCantidad() != null && carritoDTO.getCantidad() > 0) {
             existingItem.setCantidad(carritoDTO.getCantidad());
         }
@@ -243,6 +301,28 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Transactional(readOnly = true)
     public boolean tieneCarrito(String idUsuario) {
         return carritoRepository.existsByIdUsuario_IdUsuario(idUsuario);
+    }
+
+
+    /**
+     * Calcula el total del carrito de un usuario.
+     * 
+     * Suma el precio de cada producto multiplicado por su cantidad.
+     */
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal calcularTotalCarrito(String idUsuario) {
+        List<CarritoTemporalDto> items = findByUsuario(idUsuario);
+        
+        return items.stream()
+                .map(item -> {
+                    BigDecimal precio = BigDecimal.valueOf(item.getIdProductoPrecio());
+                    BigDecimal cantidad = BigDecimal.valueOf(item.getCantidad());
+                    return precio.multiply(cantidad);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     /**

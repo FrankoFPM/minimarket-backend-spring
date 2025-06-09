@@ -6,12 +6,15 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.minimarket.minimarketbackendspring.dtos.CarritoTemporalDto;
 import org.minimarket.minimarketbackendspring.dtos.DetallePedidoDTO;
 import org.minimarket.minimarketbackendspring.dtos.PedidoDTO;
 import org.minimarket.minimarketbackendspring.entities.Pedido;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.repositories.PedidoRepository;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
+import org.minimarket.minimarketbackendspring.services.interfaces.CarritoTemporalService;
+import org.minimarket.minimarketbackendspring.services.interfaces.DescuentoPromocionService;
 import org.minimarket.minimarketbackendspring.services.interfaces.DetallePedidoService;
 import org.minimarket.minimarketbackendspring.services.interfaces.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
 
+/**
+ * Implementación del servicio de gestión de pedidos.
+ * Maneja la creación de pedidos desde carrito temporal aplicando descuentos automáticamente.
+ */
 @Service
 @Transactional
 public class PedidoServiceImpl implements PedidoService {
@@ -32,6 +39,12 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Autowired
     private DetallePedidoService detallePedidoService;
+
+    @Autowired
+    private CarritoTemporalService carritoService;
+
+    @Autowired
+    private DescuentoPromocionService descuentoService; 
 
     @Override
     @Transactional(readOnly = true)
@@ -56,6 +69,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = convertToEntity(pedidoDTO);
         pedido.setIdUsuario(usuario);
 
+        // Establecer valores por defecto si no se proporcionan
         if (pedido.getEstado() == null) {
             pedido.setEstado("solicitado");
         }
@@ -89,7 +103,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido existingPedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con ID: " + id));
 
-        // Solo permitir cambios a campos NO monetarios
+        // Solo permitir cambios a campos específicos (NO totales monetarios)
         if (pedidoDTO.getEstado() != null) {
             existingPedido.setEstado(pedidoDTO.getEstado());
         }
@@ -97,12 +111,10 @@ public class PedidoServiceImpl implements PedidoService {
             existingPedido.setMetodoPago(pedidoDTO.getMetodoPago());
         }
         
-        // SOLO permitir cambio de descuento (para promociones manuales)
+        // SOLO permitir cambio de descuento manual (promociones especiales)
         if (pedidoDTO.getDescuentoAplicado() != null) {
             existingPedido.setDescuentoAplicado(pedidoDTO.getDescuentoAplicado());
         }
-
-        // NO permitir cambios directos a total e impuesto - se calculan automáticamente
 
         existingPedido.setUpdatedAt(OffsetDateTime.now());
 
@@ -111,10 +123,8 @@ public class PedidoServiceImpl implements PedidoService {
 
         Pedido updatedPedido = pedidoRepository.save(existingPedido);
         
-        // Recalcular totales considerando el nuevo descuento
         actualizarTotalesPedido(id);
         
-        // Obtener el pedido actualizado con los nuevos totales
         return convertToDTO(pedidoRepository.findById(id).orElse(updatedPedido));
     }
 
@@ -171,6 +181,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con ID: " + id));
 
+        // Validar que la transición de estado sea permitida según reglas de negocio
         validarTransicionEstado(pedido.getEstado(), nuevoEstado);
 
         pedido.setEstado(nuevoEstado);
@@ -180,15 +191,27 @@ public class PedidoServiceImpl implements PedidoService {
         return convertToDTO(updatedPedido);
     }
 
+    /**
+     * Convierte carrito temporal en pedido definitivo aplicando descuentos automáticamente.
+     * Este es el método principal para el flujo de compra del usuario.
+     */
     @Override
     public PedidoDTO crearPedidoDesdeCarrito(String idUsuario, String createdBy) {
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + idUsuario));
 
+        // Validar que el usuario no tenga ya un pedido activo
         if (existePedidoActivoParaUsuario(idUsuario)) {
             throw new IllegalStateException("El usuario ya tiene un pedido activo");
         }
 
+        // Obtener y validar items del carrito temporal
+        List<CarritoTemporalDto> itemsCarrito = carritoService.findByUsuario(idUsuario);
+        if (itemsCarrito.isEmpty()) {
+            throw new IllegalStateException("El carrito está vacío");
+        }
+
+        // Crear pedido con valores iniciales
         Pedido pedido = new Pedido();
         pedido.setIdUsuario(usuario);
         pedido.setEstado("solicitado");
@@ -200,40 +223,85 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setCreatedAt(OffsetDateTime.now());
         pedido.setUpdatedAt(OffsetDateTime.now());
 
+        // Establecer quien creó el pedido (usuario o admin)
         if (createdBy != null) {
             Usuario createdByUser = usuarioRepository.findById(createdBy).orElse(null);
             pedido.setCreatedBy(createdByUser);
             pedido.setUpdatedBy(createdByUser);
+        } else {
+            pedido.setCreatedBy(usuario);
+            pedido.setUpdatedBy(usuario);
         }
 
         Pedido savedPedido = pedidoRepository.save(pedido);
+
+        // PROCESO PRINCIPAL: Crear detalles del pedido aplicando descuentos automáticamente
+        BigDecimal totalDescuentosAplicados = BigDecimal.ZERO;
         
+        for (CarritoTemporalDto item : itemsCarrito) {
+            DetallePedidoDTO detalle = new DetallePedidoDTO();
+
+            // Obtener precio original del producto
+            BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
+            
+            // Aplicar descuentos vigentes para este producto (si existen)
+            BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
+                    item.getIdProductoIdProducto(), precioOriginal);
+            
+            // Calcular y acumular descuentos aplicados para auditoria
+            BigDecimal descuentoItem = precioOriginal.subtract(precioConDescuento);
+            BigDecimal cantidadBD = BigDecimal.valueOf(item.getCantidad());
+            totalDescuentosAplicados = totalDescuentosAplicados.add(descuentoItem.multiply(cantidadBD));
+
+            // Configurar detalle con precio ya descontado
+            detalle.setPrecioUnitario(precioConDescuento);
+            detalle.setCantidad(item.getCantidad());
+            detalle.setSubtotal(precioConDescuento.multiply(cantidadBD).setScale(2, RoundingMode.HALF_UP));
+
+            // Guardar detalle en la base de datos
+            detallePedidoService.save(detalle, savedPedido.getId(), item.getIdProductoIdProducto());
+        }
+
+        // Actualizar pedido con total de descuentos aplicados
+        savedPedido.setDescuentoAplicado(totalDescuentosAplicados.setScale(2, RoundingMode.HALF_UP));
+        pedidoRepository.save(savedPedido);
+        
+        // Vaciar carrito SOLO después de crear detalles exitosamente
+        carritoService.vaciarCarrito(idUsuario);
+        
+        // Calcular totales finales (subtotal + impuesto del 18%)
         actualizarTotalesPedido(savedPedido.getId());
 
-        return convertToDTO(savedPedido);
+        return convertToDTO(pedidoRepository.findById(savedPedido.getId()).orElse(savedPedido));
     }
 
+    /**
+     * Recalcula totales del pedido sumando detalles e impuestos.
+     * Impuesto del 18% aplicado sobre subtotal.
+     */
     @Override
     public void actualizarTotalesPedido(Long idPedido) {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido));
 
+        // Obtener todos los detalles del pedido
         List<DetallePedidoDTO> detalles = detallePedidoService.findByPedidoId(idPedido);
         
+        // Calcular subtotal sumando todos los subtotales de detalles
         BigDecimal subtotal = detalles.stream()
                 .map(DetallePedidoDTO::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        // Calcular impuesto con redondeo a 2 decimales
-        BigDecimal impuesto = subtotal.multiply(BigDecimal.valueOf(0.19))
+        // Calcular impuesto del 18% sobre subtotal con redondeo correcto
+        BigDecimal impuesto = subtotal.multiply(BigDecimal.valueOf(0.18))
                                      .setScale(2, RoundingMode.HALF_UP);
-        
-        // Calcular total con redondeo a 2 decimales
+        // Calcular total final: subtotal + impuesto - descuento aplicado
         BigDecimal total = subtotal
                 .add(impuesto)
                 .subtract(pedido.getDescuentoAplicado() != null ? pedido.getDescuentoAplicado() : BigDecimal.ZERO)
                 .setScale(2, RoundingMode.HALF_UP);
         
+        // Actualizar campos calculados
         pedido.setTotal(total);
         pedido.setImpuesto(impuesto);
         pedido.setUpdatedAt(OffsetDateTime.now());
@@ -246,6 +314,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido));
 
+        // Validar que el pedido se pueda cancelar
         if ("cancelado".equals(pedido.getEstado()) || "completado".equals(pedido.getEstado())) {
             throw new IllegalStateException("No se puede cancelar un pedido que ya está " + pedido.getEstado());
         }
@@ -253,6 +322,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado("cancelado");
         pedido.setUpdatedAt(OffsetDateTime.now());
 
+        // Registrar quien realizó la cancelación
         if (updatedBy != null) {
             Usuario updatedByUser = usuarioRepository.findById(updatedBy).orElse(null);
             pedido.setUpdatedBy(updatedByUser);
@@ -283,6 +353,10 @@ public class PedidoServiceImpl implements PedidoService {
         return pedidoRepository.countByEstado(estado);
     }
 
+    /**
+     * Verifica si un usuario tiene algún pedido en estados activos.
+     * Estados activos: solicitado, pendiente_pago, pagado (no cancelado ni completado).
+     */
     @Override
     @Transactional(readOnly = true)
     public boolean existePedidoActivoParaUsuario(String idUsuario) {
@@ -291,6 +365,9 @@ public class PedidoServiceImpl implements PedidoService {
                 || pedidoRepository.existsByIdUsuario_IdUsuarioAndEstado(idUsuario, "pagado");
     }
 
+    /**
+     * Convierte entidad Pedido a DTO incluyendo datos del usuario.
+     */
     private PedidoDTO convertToDTO(Pedido pedido) {
         return new PedidoDTO(
                 pedido.getId(),
@@ -308,6 +385,9 @@ public class PedidoServiceImpl implements PedidoService {
         );
     }
 
+    /**
+     * Convierte DTO a entidad Pedido (sin relaciones).
+     */
     private Pedido convertToEntity(PedidoDTO dto) {
         Pedido pedido = new Pedido();
         pedido.setId(dto.getId());
@@ -328,6 +408,10 @@ public class PedidoServiceImpl implements PedidoService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Valida las transiciones de estado permitidas según reglas de negocio.
+     * Implementa el flujo: solicitado -> pendiente_pago -> pagado -> completado
+     */
     private void validarTransicionEstado(String estadoActual, String nuevoEstado) {
         switch (estadoActual) {
             case "solicitado":
@@ -347,6 +431,7 @@ public class PedidoServiceImpl implements PedidoService {
                 break;
             case "completado":
             case "cancelado":
+                // Estados finales - no se pueden cambiar
                 throw new IllegalArgumentException("No se puede cambiar el estado de un pedido " + estadoActual);
             default:
                 throw new IllegalArgumentException("Estado desconocido: " + estadoActual);
