@@ -10,20 +10,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
     
-    // Buscar detalles por pedido
-    List<DetallePedido> findByIdPedido_IdPedido(Long idPedido);
+    // CORREGIDO: Usar nombres exactos de las propiedades de la entidad
+    List<DetallePedido> findByIdPedido_Id(Long idPedido);
     
     // Buscar detalles por producto
     List<DetallePedido> findByIdProducto_IdProducto(String idProducto);
     
     // Buscar detalle específico por pedido y producto
-    DetallePedido findByIdPedido_IdPedidoAndIdProducto_IdProducto(Long idPedido, String idProducto);
+    DetallePedido findByIdPedido_IdAndIdProducto_IdProducto(Long idPedido, String idProducto);
     
     // Buscar detalles por usuario (navegando por la relación)
     List<DetallePedido> findByIdPedido_IdUsuario_IdUsuario(String idUsuario);
     
     // Buscar detalles ordenados por ID
-    List<DetallePedido> findByIdPedido_IdPedidoOrderByIdDetalle(Long idPedido);
+    List<DetallePedido> findByIdPedido_IdOrderById(Long idPedido);
     
     // Buscar detalles con cantidad mayor a un valor
     List<DetallePedido> findByCantidadGreaterThan(Long cantidad);
@@ -32,17 +32,17 @@ public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Lo
     List<DetallePedido> findBySubtotalGreaterThan(BigDecimal subtotal);
     
     // Contar detalles por pedido
-    Long countByIdPedido_IdPedido(Long idPedido);
+    Long countByIdPedido_Id(Long idPedido);
     
     // Contar detalles por producto
     Long countByIdProducto_IdProducto(String idProducto);
     
     // Verificar si existe detalle para pedido y producto
-    boolean existsByIdPedido_IdPedidoAndIdProducto_IdProducto(Long idPedido, String idProducto);
+    boolean existsByIdPedido_IdAndIdProducto_IdProducto(Long idPedido, String idProducto);
     
     // Verificar si existe detalle por pedido
-    boolean existsByIdPedido_IdPedido(Long idPedido);
+    boolean existsByIdPedido_Id(Long idPedido);
     
     // Eliminar detalles por pedido
-    void deleteByIdPedido_IdPedido(Long idPedido);
+    void deleteByIdPedido_Id(Long idPedido);
 }

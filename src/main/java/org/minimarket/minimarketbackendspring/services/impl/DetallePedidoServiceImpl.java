@@ -116,7 +116,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
             throw new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido);
         }
 
-        List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido_IdPedido(idPedido);
+        List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido_Id(idPedido);
         return convertToDTOList(detalles);
     }
 
@@ -142,16 +142,21 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Override
     @Transactional(readOnly = true)
     public DetallePedidoDTO findByPedidoAndProducto(Long idPedido, String idProducto) {
-        DetallePedido detalle = detallePedidoRepository.findByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
+        DetallePedido detalle = detallePedidoRepository.findByIdPedido_IdAndIdProducto_IdProducto(idPedido, idProducto);
         return detalle != null ? convertToDTO(detalle) : null;
     }
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public DetallePedidoDTO agregarProductoAPedido(Long idPedido, String idProducto, Long cantidad) {
-        //las operaciones son completamente atómicas
+        // Validar parámetros de entrada
+        if (cantidad == null || cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
+        }
+
+        // Las operaciones son completamente atómicas
         DetallePedido detalleExistente = detallePedidoRepository
-                .findByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
+                .findByIdPedido_IdAndIdProducto_IdProducto(idPedido, idProducto);
 
         if (detalleExistente != null) {
             // Actualizar cantidad directamente en la entidad
@@ -175,14 +180,15 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
 
     @Override
     public DetallePedidoDTO actualizarCantidad(Long idPedido, String idProducto, Long nuevaCantidad) {
+        // Validar parámetros de entrada
+        if (nuevaCantidad == null || nuevaCantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
+        }
+
         DetallePedidoDTO detalleDTO = findByPedidoAndProducto(idPedido, idProducto);
 
         if (detalleDTO == null) {
             throw new EntityNotFoundException("No se encontró el producto en el pedido");
-        }
-
-        if (nuevaCantidad <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
         }
 
         // Actualizar usando el método update existente
@@ -208,29 +214,36 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
             throw new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido);
         }
 
-        detallePedidoRepository.deleteByIdPedido_IdPedido(idPedido);
+        detallePedidoRepository.deleteByIdPedido_Id(idPedido);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long countByPedidoId(Long idPedido) {
-        return detallePedidoRepository.countByIdPedido_IdPedido(idPedido);
+        return detallePedidoRepository.countByIdPedido_Id(idPedido);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existeProductoEnPedido(Long idPedido, String idProducto) {
-        return detallePedidoRepository.existsByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
+        return detallePedidoRepository.existsByIdPedido_IdAndIdProducto_IdProducto(idPedido, idProducto);
     }
 
+    /**
+     * Convierte una entidad DetallePedido a DTO
+     */
     private DetallePedidoDTO convertToDTO(DetallePedido detalle) {
+        if (detalle == null) {
+            return null;
+        }
+
         return new DetallePedidoDTO(
                 detalle.getId(),
                 detalle.getIdPedido() != null ? detalle.getIdPedido().getId() : null,
                 detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null
-                ? detalle.getIdPedido().getIdUsuario().getNombre() : null,
+                        ? detalle.getIdPedido().getIdUsuario().getNombre() : null,
                 detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null
-                ? detalle.getIdPedido().getIdUsuario().getApellido() : null,
+                        ? detalle.getIdPedido().getIdUsuario().getApellido() : null,
                 detalle.getIdProducto() != null ? detalle.getIdProducto().getNombre() : null,
                 detalle.getCantidad(),
                 detalle.getPrecioUnitario(),
@@ -238,7 +251,14 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
         );
     }
 
+    /**
+     * Convierte un DTO a entidad DetallePedido
+     */
     private DetallePedido convertToEntity(DetallePedidoDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         DetallePedido detalle = new DetallePedido();
         detalle.setId(dto.getId());
         detalle.setCantidad(dto.getCantidad());
@@ -247,7 +267,14 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
         return detalle;
     }
 
+    /**
+     * Convierte una lista de entidades a lista de DTOs
+     */
     private List<DetallePedidoDTO> convertToDTOList(List<DetallePedido> detalles) {
+        if (detalles == null) {
+            return null;
+        }
+
         return detalles.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
