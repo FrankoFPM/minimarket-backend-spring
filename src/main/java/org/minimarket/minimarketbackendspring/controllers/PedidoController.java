@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controlador REST para manejar operaciones sobre Pedido. TODO: aplicar @Valid
- * y manejo de errores
+ * Controlador REST para manejar operaciones sobre Pedido.
  */
 @RestController
 @RequestMapping("/api/pedido")
@@ -32,9 +31,7 @@ public class PedidoController {
     private PedidoService pedidoService;
 
     /**
-     * Obtiene una lista de todos los pedidos.
-     *
-     * @return
+     * Obtiene todos los pedidos.
      */
     @GetMapping
     public ResponseEntity<List<PedidoDTO>> getAllPedidos() {
@@ -42,10 +39,7 @@ public class PedidoController {
     }
 
     /**
-     * Obtiene una lista de pedidos asociados a un usuario específico.
-     *
-     * @param idUsuario el identificador del usuario
-     * @return una lista de objetos PedidoDTO
+     * Obtiene pedidos por usuario.
      */
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<PedidoDTO>> getPedidosByUsuario(@PathVariable String idUsuario) {
@@ -53,10 +47,7 @@ public class PedidoController {
     }
 
     /**
-     * Obtiene una lista de pedidos por estado específico.
-     *
-     * @param estado el estado del pedido
-     * @return una lista de objetos PedidoDTO
+     * Obtiene pedidos por estado.
      */
     @GetMapping("/estado/{estado}")
     public ResponseEntity<List<PedidoDTO>> getPedidosByEstado(@PathVariable String estado) {
@@ -64,10 +55,7 @@ public class PedidoController {
     }
 
     /**
-     * Obtiene un pedido por su ID.
-     *
-     * @param id el identificador del pedido
-     * @return
+     * Obtiene un pedido por ID.
      */
     @GetMapping("/{id}")
     public ResponseEntity<PedidoDTO> getPedidoById(@PathVariable Long id) {
@@ -75,10 +63,7 @@ public class PedidoController {
     }
 
     /**
-     * Obtiene el último pedido de un usuario específico.
-     *
-     * @param idUsuario el identificador del usuario
-     * @return
+     * Obtiene el último pedido de un usuario.
      */
     @GetMapping("/usuario/{idUsuario}/ultimo")
     public ResponseEntity<PedidoDTO> getUltimoPedidoByUsuario(@PathVariable String idUsuario) {
@@ -90,10 +75,7 @@ public class PedidoController {
     }
 
     /**
-     * Verifica si un usuario tiene un pedido activo.
-     *
-     * @param idUsuario el identificador del usuario
-     * @return
+     * Verifica si un usuario tiene pedido activo.
      */
     @GetMapping("/usuario/{idUsuario}/activo")
     public ResponseEntity<Boolean> existePedidoActivo(@PathVariable String idUsuario) {
@@ -195,10 +177,7 @@ public class PedidoController {
     }
 
     /**
-     * Elimina un pedido por su ID.
-     *
-     * @param id el identificador del pedido a eliminar
-     * @return
+     * Elimina un pedido por ID.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePedido(@PathVariable Long id) {
