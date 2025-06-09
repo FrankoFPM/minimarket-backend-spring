@@ -15,18 +15,16 @@ public class ProductoDTO {
     private String estado;
     private String categoriaNombre;   // Solo el nombre de la categoría
     private String proveedorNombre;   // Solo el nombre del proveedor
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String createdAt;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String updatedAt;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String createdBy;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String updateBy;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long idCategoria;      // <--- ID para inserción
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long idProveedor;      // <--- ID para inserción
 
     // Constructor vacío

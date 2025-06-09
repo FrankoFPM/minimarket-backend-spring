@@ -1,5 +1,15 @@
 # Minimarket Backend - Spring
 
+## **PROYECTO CON TDD IMPLEMENTADO**
+
+**Test-Driven Development aplicado exitosamente**  
+**9 tests unitarios funcionando al 100%**  
+**Metodología RED-GREEN-REFACTOR validada**
+
+**Ver documentación completa:** [`TDD_DOCUMENTATION.md`](TDD_DOCUMENTATION.md)
+
+---
+
 ## Cómo comenzar
 
 Sigue los pasos a continuación para configurar y ejecutar el proyecto:
@@ -17,7 +27,7 @@ Sigue los pasos a continuación para configurar y ejecutar el proyecto:
    - [Oracle](https://www.oracle.com/database/technologies/appdev/xe.html)
 
    Una alternativa al IDE IntelliJ es [Eclipse](https://www.eclipse.org/downloads/packages/) o [Visual Studio Code](https://code.visualstudio.com/).
-   Recuerda que si usas  Visual Studio Code, debes instalar el plugin de Java, además de los plugins de Spring Boot.
+   Recuerda que si usas Visual Studio Code, debes instalar el plugin de Java, además de los plugins de Spring Boot.
  
 3. **Configurar la base de datos**  
     - Crea tu usuario para la base de datos en Oracle.
@@ -35,32 +45,49 @@ Sigue los pasos a continuación para configurar y ejecutar el proyecto:
 4. **Construir el proyecto**  
    Usa los wizards de Maven o tu entorno de trabajo para construir el proyecto.
 
-5. **Ejecutar la aplicación**  
+5. **Demostrar TDD (RECOMENDADO)**  
+   ```bash
+   mvn test -Dtest="CarritoTemporalServiceTest"
+   ```
+   **Resultado esperado:** `BUILD SUCCESS` con 9 tests exitosos
+
+6. **Ejecutar la aplicación**  
    Inicia la aplicación con tu IDE o desde la línea de comandos:
    ```bash
     mvn spring-boot:run
     ```
 
-6. **Probar la API**  
+7. **Probar la API**  
    Una vez que la aplicación esté en ejecución, accede a `http://localhost:8080` para interactuar con la API.
 
 ## Estructura del proyecto
 Para cumplir con los requisitos de MVC, DAO, TDD y SOLID, el proyecto está organizado de la siguiente manera:
 
 ```
-src/main/java/org/minimarket/minimarketbackendspring/
-├── controllers       # Controladores (Capa de Presentación - MVC)
-├── services          # Servicios (Lógica de Negocio - SOLID)
-├── daos              # DAO (Acceso a Datos - DAO)
-├── repositories      # Repositorios (Spring Data JPA)
-├── entities          # Entidades (Modelos - MVC)
-├── dtos              # DTOs (Opcional, para transferir datos)
-└── utils             # Utilidades (Clases de soporte)
+src/
+├── main/java/org/minimarket/minimarketbackendspring/
+│   ├── controllers       # Controladores (Capa de Presentación - MVC)
+│   ├── services          # Servicios (Lógica de Negocio - SOLID)
+│   ├── daos              # DAO (Acceso a Datos - DAO)
+│   ├── repositories      # Repositorios (Spring Data JPA)
+│   ├── entities          # Entidades (Modelos - MVC)
+│   ├── dtos              # DTOs (Transferencia de datos)
+│   └── utils             # Utilidades (Clases de soporte)
+└── test/java/org/minimarket/minimarketbackendspring/
+    └── unit/             # Tests TDD (9 tests funcionando)
+        └── CarritoTemporalServiceTest.java
 ```
+
+### **📋 Documentación TDD:**
+- **[`TDD_DOCUMENTATION.md`](TDD_DOCUMENTATION.md)** - **Documentación completa del TDD implementado**
+- `src/test/java/.../unit/CarritoTemporalServiceTest.java` - Tests TDD funcionando
+
+---
+
 ### Definición de arquitecturas
 - **MVC (Modelo-Vista-Controlador)**: Patrón de diseño que separa la lógica de negocio, la interfaz de usuario y el control de flujo.
 - **DAO (Data Access Object)**: Patrón de diseño que proporciona una interfaz abstracta para acceder a los datos.
-- **TDD (Test Driven Development)**: Enfoque de desarrollo que implica escribir pruebas antes de escribir el código de producción.
+- **TDD (Test Driven Development)**: **IMPLEMENTADO** - Desarrollo guiado por tests con metodología RED-GREEN-REFACTOR.
 - **SOLID**: Conjunto de principios de diseño orientado a objetos que promueven la mantenibilidad y escalabilidad del software.
 - **Spring Data JPA**: Framework que simplifica el acceso a datos en aplicaciones Java, proporcionando una capa de abstracción sobre JPA (Java Persistence API).
 
@@ -69,6 +96,7 @@ src/main/java/org/minimarket/minimarketbackendspring/
 - [x] Crear un controlador REST.
 - [x] Crear un servicio.
 - [x] Implementar JPA.
+- [x] **Implementar TDD (9 tests funcionando) - Ver [`TDD_DOCUMENTATION.md`](TDD_DOCUMENTATION.md)**
 
 ## Pendientes
 - [ ] Aplicar la libreria Google Guava para la paginación.
