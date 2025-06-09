@@ -116,6 +116,17 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.findByRol(rol));
     }
 
+    /**
+     * Encuentra usuarios con roles distintos al especificado.
+     *
+     * @param rol el rol a excluir
+     * @return lista de usuarios con roles distintos al especificado
+     */
+    @GetMapping("/rol/not/{rol}")
+    public ResponseEntity<List<UsuarioDTO>> getUsuariosByRolNot(@PathVariable String rol) {
+        return ResponseEntity.ok(usuarioService.findByRolNot(rol));
+    }
+
 
     /**
      * Crea un nuevo usuario.
