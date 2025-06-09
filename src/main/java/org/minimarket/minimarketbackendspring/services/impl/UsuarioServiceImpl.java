@@ -10,7 +10,6 @@ import org.minimarket.minimarketbackendspring.entities.Distrito;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.repositories.DistritoRepository;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
-import org.minimarket.minimarketbackendspring.services.interfaces.DistritoService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +28,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private DistritoRepository distritoRepository;
-    @Autowired
-    private DistritoService distritoService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -246,9 +243,20 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     @Override
     public void delete(String id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario no encontrado con ID: " + id);
-        }
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
+        usuario.setEstado("inactivo");
+        usuarioRepository.save(usuario);
+    }
+
+    /**
+     * @param rol
+     * @return
+     */
+    @Override
+    public List<UsuarioDTO> findByRolNot(String rol) {
+        return usuarioRepository.findByRolNot(rol).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }

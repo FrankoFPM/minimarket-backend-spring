@@ -135,7 +135,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         // Aqui se genera un ID único para nuevos productos
         if (producto.getIdProducto() == null || producto.getIdProducto().isEmpty()) {
-            p.setIdProducto(UUID.randomUUID().toString());
+            p.setIdProducto(UUID.randomUUID().toString().replace("-", "").toUpperCase());
         } else {
             p.setIdProducto(producto.getIdProducto());
         }
@@ -186,25 +186,23 @@ public class ProductoServiceImpl implements ProductoService {
         p.setFoto(producto.getFoto());
         p.setEstado(producto.getEstado());
 
-        // Actualizar categoria si se proporciona ID
-        if (producto.getIdCategoria() != null) {
-            Categoria categoria = categoriaRepository.findById(producto.getIdCategoria())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Categoría no encontrada con ID: " + producto.getIdCategoria()));
-            p.setIdCategoria(categoria);
-        } else {
-            p.setIdCategoria(null);
+        // Validar y asignar categoría
+        if (producto.getIdCategoria() == null) {
+            throw new IllegalArgumentException("La categoría no puede ser nula.");
         }
+        Categoria categoria = categoriaRepository.findById(producto.getIdCategoria())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Categoría no encontrada con ID: " + producto.getIdCategoria()));
+        p.setIdCategoria(categoria);
 
-        // Actualizar proveedor si se proporciona ID
-        if (producto.getIdProveedor() != null) {
-            Proveedor proveedor = proveedorRepository.findById(producto.getIdProveedor())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Proveedor no encontrado con ID: " + producto.getIdProveedor()));
-            p.setIdProveedor(proveedor);
-        } else {
-            p.setIdProveedor(null);
+        // Validar y asignar proveedor
+        if (producto.getIdProveedor() == null) {
+            throw new IllegalArgumentException("El proveedor no puede ser nulo.");
         }
+        Proveedor proveedor = proveedorRepository.findById(producto.getIdProveedor())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Proveedor no encontrado con ID: " + producto.getIdProveedor()));
+        p.setIdProveedor(proveedor);
 
         productoRepository.save(p);
     }

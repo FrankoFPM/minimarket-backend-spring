@@ -8,8 +8,8 @@ import java.time.Instant;
  */
 public class CarritoTemporalDto implements Serializable {
     private Long id;
-    private String idUsuarioIdUsuario;
-    private String idProductoIdProducto;
+    private String idUsuario;
+    private String idProducto;
     private String idProductoNombre;
     private Double idProductoPrecio;
     private Long cantidad;
@@ -18,10 +18,10 @@ public class CarritoTemporalDto implements Serializable {
     public CarritoTemporalDto() {
     }
 
-    public CarritoTemporalDto(Long id, String idUsuarioIdUsuario, String idProductoIdProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, Instant fechaAgregado) {
+    public CarritoTemporalDto(Long id, String idUsuario, String idProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, Instant fechaAgregado) {
         this.id = id;
-        this.idUsuarioIdUsuario = idUsuarioIdUsuario;
-        this.idProductoIdProducto = idProductoIdProducto;
+        this.idUsuario = idUsuario;
+        this.idProducto = idProducto;
         this.idProductoNombre = idProductoNombre;
         this.idProductoPrecio = idProductoPrecio;
         this.cantidad = cantidad;
@@ -36,20 +36,20 @@ public class CarritoTemporalDto implements Serializable {
         this.id = id;
     }
 
-    public String getIdUsuarioIdUsuario() {
-        return idUsuarioIdUsuario;
+    public String getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setIdUsuarioIdUsuario(String idUsuarioIdUsuario) {
-        this.idUsuarioIdUsuario = idUsuarioIdUsuario;
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public String getIdProductoIdProducto() {
-        return idProductoIdProducto;
+    public String getIdProducto() {
+        return idProducto;
     }
 
-    public void setIdProductoIdProducto(String idProductoIdProducto) {
-        this.idProductoIdProducto = idProductoIdProducto;
+    public void setIdProducto(String idProducto) {
+        this.idProducto = idProducto;
     }
 
     public String getIdProductoNombre() {
@@ -88,8 +88,8 @@ public class CarritoTemporalDto implements Serializable {
     public String toString() {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
-                "idUsuarioIdUsuario = " + idUsuarioIdUsuario + ", " +
-                "idProductoIdProducto = " + idProductoIdProducto + ", " +
+                "idUsuario = " + idUsuario + ", " +
+                "idProducto = " + idProducto + ", " +
                 "idProductoNombre = " + idProductoNombre + ", " +
                 "idProductoPrecio = " + idProductoPrecio + ", " +
                 "cantidad = " + cantidad + ", " +

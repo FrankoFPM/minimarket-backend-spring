@@ -10,15 +10,12 @@ public class UsuarioDTO {
     private String telefono;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long distritoId;
     private String distritoNombre;
     private String direccion;
     private String googleId;
     private String facebookId;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String rol;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String estado;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String createdBy;
