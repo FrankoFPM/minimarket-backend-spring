@@ -7,6 +7,7 @@ import java.util.List;
 import org.minimarket.minimarketbackendspring.dtos.ComprobanteDTO;
 import org.minimarket.minimarketbackendspring.services.interfaces.ComprobanteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -94,8 +95,8 @@ public class ComprobanteController {
      */
     @GetMapping("/fecha-range")
     public ResponseEntity<List<ComprobanteDTO>> getComprobantesByFechaRange(
-            @RequestParam OffsetDateTime fechaInicio,
-            @RequestParam OffsetDateTime fechaFin) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fechaFin) {
         return ResponseEntity.ok(comprobanteService.findByFechaRange(fechaInicio, fechaFin));
     }
 

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/carrito")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class CarritoTemporalController {
 
     @Autowired

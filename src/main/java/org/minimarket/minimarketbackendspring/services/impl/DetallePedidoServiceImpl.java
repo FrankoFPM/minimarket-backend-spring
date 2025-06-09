@@ -14,6 +14,7 @@ import org.minimarket.minimarketbackendspring.repositories.ProductoRepository;
 import org.minimarket.minimarketbackendspring.services.interfaces.DetallePedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -24,10 +25,10 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
 
     @Autowired
     private DetallePedidoRepository detallePedidoRepository;
-    
+
     @Autowired
     private PedidoRepository pedidoRepository;
-    
+
     @Autowired
     private ProductoRepository productoRepository;
 
@@ -114,8 +115,8 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
         if (!pedidoRepository.existsById(idPedido)) {
             throw new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido);
         }
-        
-        List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido_IdPedido(idPedido); 
+
+        List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido_IdPedido(idPedido);
         return convertToDTOList(detalles);
     }
 
@@ -126,7 +127,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
         if (!productoRepository.existsById(idProducto)) {
             throw new EntityNotFoundException("Producto no encontrado con ID: " + idProducto);
         }
-        
+
         List<DetallePedido> detalles = detallePedidoRepository.findByIdProducto_IdProducto(idProducto);
         return convertToDTOList(detalles);
     }
@@ -141,22 +142,31 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Override
     @Transactional(readOnly = true)
     public DetallePedidoDTO findByPedidoAndProducto(Long idPedido, String idProducto) {
-        DetallePedido detalle = detallePedidoRepository.findByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto); 
+        DetallePedido detalle = detallePedidoRepository.findByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
         return detalle != null ? convertToDTO(detalle) : null;
     }
 
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public DetallePedidoDTO agregarProductoAPedido(Long idPedido, String idProducto, Long cantidad) {
-        // Verificar si el producto ya existe en el pedido usando método existente
-        boolean existe = detallePedidoRepository.existsByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto); 
-        
-        if (existe) {
-            // Si existe, actualizar cantidad
-            DetallePedidoDTO detalleExistente = findByPedidoAndProducto(idPedido, idProducto);
+        //las operaciones son completamente atómicas
+        DetallePedido detalleExistente = detallePedidoRepository
+                .findByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
+
+        if (detalleExistente != null) {
+            // Actualizar cantidad directamente en la entidad
             Long nuevaCantidad = detalleExistente.getCantidad() + cantidad;
-            return actualizarCantidad(idPedido, idProducto, nuevaCantidad);
+            detalleExistente.setCantidad(nuevaCantidad);
+
+            // Recalcular subtotal
+            BigDecimal subtotal = detalleExistente.getPrecioUnitario()
+                    .multiply(BigDecimal.valueOf(nuevaCantidad));
+            detalleExistente.setSubtotal(subtotal);
+
+            DetallePedido savedDetalle = detallePedidoRepository.save(detalleExistente);
+            return convertToDTO(savedDetalle);
         } else {
-            // Si no existe, crear nuevo detalle
+            // Crear nuevo detalle
             DetallePedidoDTO nuevoDetalle = new DetallePedidoDTO();
             nuevoDetalle.setCantidad(cantidad);
             return save(nuevoDetalle, idPedido, idProducto);
@@ -166,7 +176,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Override
     public DetallePedidoDTO actualizarCantidad(Long idPedido, String idProducto, Long nuevaCantidad) {
         DetallePedidoDTO detalleDTO = findByPedidoAndProducto(idPedido, idProducto);
-        
+
         if (detalleDTO == null) {
             throw new EntityNotFoundException("No se encontró el producto en el pedido");
         }
@@ -183,7 +193,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Override
     public void eliminarProductoDePedido(Long idPedido, String idProducto) {
         DetallePedidoDTO detalleDTO = findByPedidoAndProducto(idPedido, idProducto);
-        
+
         if (detalleDTO == null) {
             throw new EntityNotFoundException("No se encontró el producto en el pedido");
         }
@@ -197,8 +207,8 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
         if (!pedidoRepository.existsById(idPedido)) {
             throw new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido);
         }
-        
-        detallePedidoRepository.deleteByIdPedido_IdPedido(idPedido); 
+
+        detallePedidoRepository.deleteByIdPedido_IdPedido(idPedido);
     }
 
     @Override
@@ -211,30 +221,29 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Transactional(readOnly = true)
     public boolean existeProductoEnPedido(Long idPedido, String idProducto) {
         return detallePedidoRepository.existsByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
-    } 
-
+    }
 
     private DetallePedidoDTO convertToDTO(DetallePedido detalle) {
         return new DetallePedidoDTO(
-            detalle.getId(),                                                 
-            detalle.getIdPedido() != null ? detalle.getIdPedido().getId() : null, 
-            detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null ? 
-                detalle.getIdPedido().getIdUsuario().getNombre() : null,             
-            detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null ? 
-                detalle.getIdPedido().getIdUsuario().getApellido() : null,         
-            detalle.getIdProducto() != null ? detalle.getIdProducto().getNombre() : null, 
-            detalle.getCantidad(),                                                   
-            detalle.getPrecioUnitario(),                                     
-            detalle.getSubtotal()                                 
+                detalle.getId(),
+                detalle.getIdPedido() != null ? detalle.getIdPedido().getId() : null,
+                detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null
+                ? detalle.getIdPedido().getIdUsuario().getNombre() : null,
+                detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null
+                ? detalle.getIdPedido().getIdUsuario().getApellido() : null,
+                detalle.getIdProducto() != null ? detalle.getIdProducto().getNombre() : null,
+                detalle.getCantidad(),
+                detalle.getPrecioUnitario(),
+                detalle.getSubtotal()
         );
     }
 
     private DetallePedido convertToEntity(DetallePedidoDTO dto) {
         DetallePedido detalle = new DetallePedido();
-        detalle.setId(dto.getId());  
-        detalle.setCantidad(dto.getCantidad());       
+        detalle.setId(dto.getId());
+        detalle.setCantidad(dto.getCantidad());
         detalle.setPrecioUnitario(dto.getPrecioUnitario());
-        detalle.setSubtotal(dto.getSubtotal());           
+        detalle.setSubtotal(dto.getSubtotal());
         return detalle;
     }
 
