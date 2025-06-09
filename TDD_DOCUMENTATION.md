@@ -250,8 +250,7 @@ void debeLanzarExcepcion_UsuarioNoExiste_TDD() {
 ## 📋 **COMANDOS DE DEMOSTRACIÓN TDD**
 
 ```bash
-# Demostrar TDD funcionando:
-cd C:\Users\USER\Documents\minimarket-backend-spring
+
 
 # 1. Ejecutar TDD principal 
 mvn test -Dtest="CarritoTemporalServiceTest"
