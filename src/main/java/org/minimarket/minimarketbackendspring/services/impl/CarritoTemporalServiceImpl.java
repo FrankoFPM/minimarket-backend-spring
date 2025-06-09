@@ -81,7 +81,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
                     
                     // Aplicar descuentos si existen
                     BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
-                            item.getIdProductoIdProducto(), precioOriginal);
+                            item.getIdProducto(), precioOriginal);
                     
                     return precioConDescuento.multiply(cantidad);
                 })
@@ -102,12 +102,12 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
         return items.stream()
                 .map(item -> {
                     // Verificar si tiene descuentos activos
-                    boolean tieneDescuento = descuentoService.tieneDescuentosActivos(item.getIdProductoIdProducto());
+                    boolean tieneDescuento = descuentoService.tieneDescuentosActivos(item.getIdProducto());
                     
                     if (tieneDescuento) {
                         BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
                         BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
-                                item.getIdProductoIdProducto(), precioOriginal);
+                                item.getIdProducto(), precioOriginal);
                         
                     }
                     

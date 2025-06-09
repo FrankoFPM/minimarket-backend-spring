@@ -305,8 +305,9 @@ public class DescuentoPromocionServiceImpl implements DescuentoPromocionService 
         }
 
         LocalDate fechaActual = LocalDate.now();
-        return !fechaActual.isBefore(descuento.getFechaInicio()) && 
-               !fechaActual.isAfter(descuento.getFechaFin());
+        // Verificar si la fecha actual está dentro del rango de fechas del descuento
+        return (fechaActual.isEqual(descuento.getFechaInicio()) || fechaActual.isAfter(descuento.getFechaInicio())) &&
+               (fechaActual.isEqual(descuento.getFechaFin()) || fechaActual.isBefore(descuento.getFechaFin()));
     }
 
     /**

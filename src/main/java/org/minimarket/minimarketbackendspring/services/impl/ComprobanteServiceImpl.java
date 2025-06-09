@@ -83,7 +83,10 @@ public class ComprobanteServiceImpl implements ComprobanteService {
             existingComprobante.setFecha(comprobanteDTO.getFecha());
         }
 
-        // NO permitir cambios en monto total - debe coincidir con el pedido
+        if (comprobanteDTO.getMontoTotal() != null
+                && !comprobanteDTO.getMontoTotal().equals(existingComprobante.getMontoTotal())) {
+            throw new IllegalArgumentException("No se permite modificar el monto total del comprobante");
+        }
 
         Comprobante updatedComprobante = comprobanteRepository.save(existingComprobante);
         return convertToDTO(updatedComprobante);
@@ -121,6 +124,10 @@ public class ComprobanteServiceImpl implements ComprobanteService {
     @Override
     @Transactional(readOnly = true)
     public List<ComprobanteDTO> findByFechaRange(OffsetDateTime fechaInicio, OffsetDateTime fechaFin) {
+        if (fechaInicio == null || fechaFin == null) {
+            throw new IllegalArgumentException("Las fechas de inicio y fin no pueden ser nulas");
+        }
+
         if (fechaInicio.isAfter(fechaFin)) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
@@ -132,6 +139,10 @@ public class ComprobanteServiceImpl implements ComprobanteService {
     @Override
     @Transactional(readOnly = true)
     public List<ComprobanteDTO> findByMontoRange(BigDecimal montoMinimo, BigDecimal montoMaximo) {
+        if (montoMinimo == null || montoMaximo == null) {
+            throw new IllegalArgumentException("Los montos mínimo y máximo no pueden ser nulos");
+        }
+
         if (montoMinimo.compareTo(montoMaximo) > 0) {
             throw new IllegalArgumentException("El monto mínimo no puede ser mayor al monto máximo");
         }
@@ -221,7 +232,7 @@ public class ComprobanteServiceImpl implements ComprobanteService {
     @Transactional(readOnly = true)
     public BigDecimal calcularTotalMontosPorTipo(String tipo) {
         List<Comprobante> comprobantes = comprobanteRepository.findByTipo(tipo);
-        
+
         return comprobantes.stream()
                 .map(Comprobante::getMontoTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -231,11 +242,11 @@ public class ComprobanteServiceImpl implements ComprobanteService {
     @Transactional(readOnly = true)
     public ComprobanteDTO findUltimoComprobantePorUsuario(String idUsuario) {
         List<Comprobante> comprobantes = comprobanteRepository.findByIdPedido_IdUsuario_IdUsuarioOrderByFechaDesc(idUsuario);
-        
+
         if (comprobantes.isEmpty()) {
             return null;
         }
-        
+
         return convertToDTO(comprobantes.get(0));
     }
 
@@ -247,18 +258,19 @@ public class ComprobanteServiceImpl implements ComprobanteService {
     }
 
     /**
-     * Convierte entidad Comprobante a DTO incluyendo datos del pedido y usuario.
+     * Convierte entidad Comprobante a DTO incluyendo datos del pedido y
+     * usuario.
      */
     private ComprobanteDTO convertToDTO(Comprobante comprobante) {
         return new ComprobanteDTO(
                 comprobante.getId(),
                 comprobante.getIdPedido() != null ? comprobante.getIdPedido().getId() : null,
-                comprobante.getIdPedido() != null && comprobante.getIdPedido().getIdUsuario() != null ? 
-                    comprobante.getIdPedido().getIdUsuario().getIdUsuario() : null,
-                comprobante.getIdPedido() != null && comprobante.getIdPedido().getIdUsuario() != null ? 
-                    comprobante.getIdPedido().getIdUsuario().getNombre() : null,
-                comprobante.getIdPedido() != null && comprobante.getIdPedido().getIdUsuario() != null ? 
-                    comprobante.getIdPedido().getIdUsuario().getApellido() : null,
+                comprobante.getIdPedido() != null && comprobante.getIdPedido().getIdUsuario() != null
+                ? comprobante.getIdPedido().getIdUsuario().getIdUsuario() : null,
+                comprobante.getIdPedido() != null && comprobante.getIdPedido().getIdUsuario() != null
+                ? comprobante.getIdPedido().getIdUsuario().getNombre() : null,
+                comprobante.getIdPedido() != null && comprobante.getIdPedido().getIdUsuario() != null
+                ? comprobante.getIdPedido().getIdUsuario().getApellido() : null,
                 comprobante.getIdPedido() != null ? comprobante.getIdPedido().getMetodoPago() : null,
                 comprobante.getTipo(),
                 comprobante.getFecha(),
@@ -267,7 +279,8 @@ public class ComprobanteServiceImpl implements ComprobanteService {
     }
 
     /**
-     * Convierte DTO a entidad Comprobante sin incluir datos del pedido o usuario.
+     * Convierte DTO a entidad Comprobante sin incluir datos del pedido o
+     * usuario.
      */
     private Comprobante convertToEntity(ComprobanteDTO dto) {
         Comprobante comprobante = new Comprobante();

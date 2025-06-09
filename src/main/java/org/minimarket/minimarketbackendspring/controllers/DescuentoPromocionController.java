@@ -20,16 +20,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
 /**
  * Controlador REST para manejar operaciones sobre descuentos y promociones.
  */
 @RestController
 @RequestMapping("/api/descuentos")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "https://minimarket-frontend.vercel.app"})
 public class DescuentoPromocionController {
-
     @Autowired
+    // Inyecta el servicio de descuentos
     private DescuentoPromocionService descuentoService;
+    public DescuentoPromocionController(DescuentoPromocionService descuentoService) {
+        this.descuentoService = descuentoService;
+    }
 
     /**
      * Obtiene todos los descuentos.
@@ -135,8 +140,8 @@ public class DescuentoPromocionController {
      */
     @PostMapping
     public ResponseEntity<DescuentoPromocionDTO> createDescuento(
-            @RequestBody DescuentoPromocionDTO descuento,
-            @RequestParam String idProducto) {
+            @RequestBody DescuentoPromocionDTO descuento, 
+            @RequestParam String idProducto) {        
         DescuentoPromocionDTO savedDescuento = descuentoService.save(descuento, idProducto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDescuento);
     }

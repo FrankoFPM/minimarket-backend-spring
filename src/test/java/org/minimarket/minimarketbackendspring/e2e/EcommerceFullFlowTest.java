@@ -1,9 +1,9 @@
 package org.minimarket.minimarketbackendspring.e2e;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests End-to-End del flujo completo de e-commerce

@@ -86,8 +86,8 @@ class CarritoTemporalServiceTest {
 
         carritoDTO = new CarritoTemporalDto();
         carritoDTO.setId(1L);
-        carritoDTO.setIdUsuarioIdUsuario("USER123");
-        carritoDTO.setIdProductoIdProducto("PROD001");
+        carritoDTO.setIdUsuario("USER123");
+        carritoDTO.setIdProducto("PROD001");
         carritoDTO.setIdProductoNombre("Leche Gloria");
         carritoDTO.setIdProductoPrecio(4.50);
         carritoDTO.setCantidad(2L);
@@ -116,8 +116,8 @@ class CarritoTemporalServiceTest {
 
         // Then - Validaciones TDD
         assertNotNull(resultado, "Debe retornar el item agregado al carrito");
-        assertEquals("USER123", resultado.getIdUsuarioIdUsuario());
-        assertEquals("PROD001", resultado.getIdProductoIdProducto());
+        assertEquals("USER123", resultado.getIdUsuario());
+        assertEquals("PROD001", resultado.getIdProducto());
         assertEquals("Leche Gloria", resultado.getIdProductoNombre());
         assertEquals(4.50, resultado.getIdProductoPrecio());
         assertEquals(2L, resultado.getCantidad());
@@ -158,6 +158,7 @@ class CarritoTemporalServiceTest {
 
         // Then - Debe incrementar cantidad existente (2 + 3 = 5)
         assertNotNull(resultado);
+        assertEquals(5L, resultado.getCantidad(), "Cantidad debe incrementarse de 2 a 5");
         verify(carritoRepository).existsByIdUsuario_IdUsuarioAndIdProducto_IdProducto(idUsuario, idProducto);
         verify(carritoRepository, atLeast(1)).findByIdUsuario_IdUsuarioAndIdProducto_IdProducto(idUsuario, idProducto);
         verify(carritoRepository).save(any(CarritoTemporal.class));
@@ -179,13 +180,14 @@ class CarritoTemporalServiceTest {
 
         // Configurar descuentos - producto con 10% descuento
         when(descuentoService.calcularPrecioConDescuento("PROD001", BigDecimal.valueOf(4.50)))
-                .thenReturn(BigDecimal.valueOf(4.05)); // 4.50 - 10% = 4.05
+                .thenReturn(BigDecimal.valueOf(4.05));
 
         // When - Calcular total con descuentos
         BigDecimal total = carritoService.calcularTotalCarritoConDescuentos(idUsuario);
 
         // Then - Debe aplicar descuentos en el cálculo (4.05 * 2 = 8.10)
         assertNotNull(total, "Debe calcular total con descuentos");
+        assertEquals(0, BigDecimal.valueOf(8.10).compareTo(total), "Total con descuento debe ser 8.10");
         assertTrue(total.compareTo(BigDecimal.ZERO) > 0, "Total debe ser mayor a cero");
 
         // Verificar que se calcularon descuentos

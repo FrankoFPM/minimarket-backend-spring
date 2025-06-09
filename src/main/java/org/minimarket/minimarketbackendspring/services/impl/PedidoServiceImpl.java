@@ -143,7 +143,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + idUsuario);
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByIdUsuarioIdUsuario(idUsuario);
+        List<Pedido> pedidos = pedidoRepository.findByIdUsuario_IdUsuario(idUsuario);
         return convertToDTOList(pedidos);
     }
 
@@ -161,7 +161,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + idUsuario);
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndIdUsuarioIdUsuario(estado, idUsuario);
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndIdUsuario_IdUsuario(estado, idUsuario);
         return convertToDTOList(pedidos);
     }
 
@@ -246,7 +246,7 @@ public class PedidoServiceImpl implements PedidoService {
             
             // Aplicar descuentos vigentes para este producto (si existen)
             BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
-                    item.getIdProductoIdProducto(), precioOriginal);
+                    item.getIdProducto(), precioOriginal);
             
             // Calcular y acumular descuentos aplicados para auditoria
             BigDecimal descuentoItem = precioOriginal.subtract(precioConDescuento);
@@ -259,7 +259,7 @@ public class PedidoServiceImpl implements PedidoService {
             detalle.setSubtotal(precioConDescuento.multiply(cantidadBD).setScale(2, RoundingMode.HALF_UP));
 
             // Guardar detalle en la base de datos
-            detallePedidoService.save(detalle, savedPedido.getId(), item.getIdProductoIdProducto());
+            detallePedidoService.save(detalle, savedPedido.getId(), item.getIdProducto());
         }
 
         // Actualizar pedido con total de descuentos aplicados
@@ -295,10 +295,9 @@ public class PedidoServiceImpl implements PedidoService {
         // Calcular impuesto del 18% sobre subtotal con redondeo correcto
         BigDecimal impuesto = subtotal.multiply(BigDecimal.valueOf(0.18))
                                      .setScale(2, RoundingMode.HALF_UP);
-        // Calcular total final: subtotal + impuesto - descuento aplicado
+        // Calcular total final: subtotal + impuesto
         BigDecimal total = subtotal
                 .add(impuesto)
-                .subtract(pedido.getDescuentoAplicado() != null ? pedido.getDescuentoAplicado() : BigDecimal.ZERO)
                 .setScale(2, RoundingMode.HALF_UP);
         
         // Actualizar campos calculados

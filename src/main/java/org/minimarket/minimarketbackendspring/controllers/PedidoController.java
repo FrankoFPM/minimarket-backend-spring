@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.persistence.EntityNotFoundException;
+
 /**
  * Controlador REST para manejar operaciones sobre Pedido.
  */
@@ -59,7 +61,12 @@ public class PedidoController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<PedidoDTO> getPedidoById(@PathVariable Long id) {
-        return ResponseEntity.ok(pedidoService.findById(id));
+        try {
+            PedidoDTO pedido = pedidoService.findById(id);
+            return ResponseEntity.ok(pedido);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**

@@ -18,10 +18,10 @@ public class CarritoTemporalDto implements Serializable {
     public CarritoTemporalDto() {
     }
 
-    public CarritoTemporalDto(Long id, String idUsuarioIdUsuario, String idProductoIdProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, Instant fechaAgregado) {
+    public CarritoTemporalDto(Long id, String idUsuario, String idProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, Instant fechaAgregado) {
         this.id = id;
-        this.idUsuario = idUsuarioIdUsuario;
-        this.idProducto = idProductoIdProducto;
+        this.idUsuario = idUsuario;
+        this.idProducto = idProducto;
         this.idProductoNombre = idProductoNombre;
         this.idProductoPrecio = idProductoPrecio;
         this.cantidad = cantidad;
@@ -36,20 +36,20 @@ public class CarritoTemporalDto implements Serializable {
         this.id = id;
     }
 
-    public String getIdUsuarioIdUsuario() {
+    public String getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuarioIdUsuario(String idUsuarioIdUsuario) {
-        this.idUsuario = idUsuarioIdUsuario;
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public String getIdProductoIdProducto() {
+    public String getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProductoIdProducto(String idProductoIdProducto) {
-        this.idProducto = idProductoIdProducto;
+    public void setIdProducto(String idProducto) {
+        this.idProducto = idProducto;
     }
 
     public String getIdProductoNombre() {
@@ -88,8 +88,8 @@ public class CarritoTemporalDto implements Serializable {
     public String toString() {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
-                "idUsuarioIdUsuario = " + idUsuario + ", " +
-                "idProductoIdProducto = " + idProducto + ", " +
+                "idUsuario = " + idUsuario + ", " +
+                "idProducto = " + idProducto + ", " +
                 "idProductoNombre = " + idProductoNombre + ", " +
                 "idProductoPrecio = " + idProductoPrecio + ", " +
                 "cantidad = " + cantidad + ", " +

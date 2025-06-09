@@ -18,13 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controlador REST para manejar operaciones sobre DetallePedido.
- * TODO: aplicar @Valid y manejo de errores
- */
+import jakarta.persistence.EntityNotFoundException;
+
+
 @RestController
 @RequestMapping("/api/detalle-pedidos")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "https://minimarket-frontend.vercel.app"})
 public class DetallePedidoController {
 
     @Autowired
@@ -77,8 +76,12 @@ public class DetallePedidoController {
         try {
             DetallePedidoDTO savedDetalle = detallePedidoService.save(detallePedidoDTO, idPedido, idProducto);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedDetalle);
-        } catch (Exception e) {
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
