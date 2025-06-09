@@ -243,9 +243,20 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     @Override
     public void delete(String id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario no encontrado con ID: " + id);
-        }
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
+        usuario.setEstado("inactivo");
+        usuarioRepository.save(usuario);
+    }
+
+    /**
+     * @param rol
+     * @return
+     */
+    @Override
+    public List<UsuarioDTO> findByRolNot(String rol) {
+        return usuarioRepository.findByRolNot(rol).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }
