@@ -115,7 +115,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
             throw new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido);
         }
         
-        List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido_Id(idPedido); 
+        List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido_IdPedido(idPedido); 
         return convertToDTOList(detalles);
     }
 
@@ -127,7 +127,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
             throw new EntityNotFoundException("Producto no encontrado con ID: " + idProducto);
         }
         
-        List<DetallePedido> detalles = detallePedidoRepository.findByIdProducto_Id(idProducto);
+        List<DetallePedido> detalles = detallePedidoRepository.findByIdProducto_IdProducto(idProducto);
         return convertToDTOList(detalles);
     }
 
@@ -141,14 +141,14 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Override
     @Transactional(readOnly = true)
     public DetallePedidoDTO findByPedidoAndProducto(Long idPedido, String idProducto) {
-        DetallePedido detalle = detallePedidoRepository.findByIdPedido_IdAndIdProducto_Id(idPedido, idProducto); 
+        DetallePedido detalle = detallePedidoRepository.findByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto); 
         return detalle != null ? convertToDTO(detalle) : null;
     }
 
     @Override
     public DetallePedidoDTO agregarProductoAPedido(Long idPedido, String idProducto, Long cantidad) {
         // Verificar si el producto ya existe en el pedido usando método existente
-        boolean existe = detallePedidoRepository.existsByIdPedido_IdAndIdProducto_Id(idPedido, idProducto); 
+        boolean existe = detallePedidoRepository.existsByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto); 
         
         if (existe) {
             // Si existe, actualizar cantidad
@@ -198,19 +198,19 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
             throw new EntityNotFoundException("Pedido no encontrado con ID: " + idPedido);
         }
         
-        detallePedidoRepository.deleteByIdPedido_Id(idPedido); 
+        detallePedidoRepository.deleteByIdPedido_IdPedido(idPedido); 
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long countByPedidoId(Long idPedido) {
-        return detallePedidoRepository.countByIdPedido_Id(idPedido);
+        return detallePedidoRepository.countByIdPedido_IdPedido(idPedido);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existeProductoEnPedido(Long idPedido, String idProducto) {
-        return detallePedidoRepository.existsByIdPedido_IdAndIdProducto_Id(idPedido, idProducto);
+        return detallePedidoRepository.existsByIdPedido_IdPedidoAndIdProducto_IdProducto(idPedido, idProducto);
     } 
 
 
