@@ -64,7 +64,6 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
         return convertToDTO(item);
     }
 
-
     /**
      * Calcula el total del carrito aplicando descuentos disponibles.
      */
@@ -72,23 +71,22 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Transactional(readOnly = true)
     public BigDecimal calcularTotalCarritoConDescuentos(String idUsuario) {
         List<CarritoTemporalDto> items = findByUsuario(idUsuario);
-        
+
         return items.stream()
                 .map(item -> {
                     // Precio original del producto
                     BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
                     BigDecimal cantidad = BigDecimal.valueOf(item.getCantidad());
-                    
+
                     // Aplicar descuentos si existen
                     BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
                             item.getIdProducto(), precioOriginal);
-                    
+
                     return precioConDescuento.multiply(cantidad);
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
     }
-
 
     /**
      * Obtiene items del carrito con información de descuentos aplicados.
@@ -97,20 +95,22 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Transactional(readOnly = true)
     public List<CarritoTemporalDto> findByUsuarioConDescuentos(String idUsuario) {
         List<CarritoTemporalDto> items = findByUsuario(idUsuario);
-        
+
         // Enriquecer cada item con información de descuentos
         return items.stream()
                 .map(item -> {
                     // Verificar si tiene descuentos activos
                     boolean tieneDescuento = descuentoService.tieneDescuentosActivos(item.getIdProducto());
-                    
+
                     if (tieneDescuento) {
                         BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
                         BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
                                 item.getIdProducto(), precioOriginal);
-                        
+                        // TODO: Asignar el precioConDescuento al DTO cuando se agregue el campo
+                        // correspondiente
+
                     }
-                    
+
                     return item;
                 })
                 .collect(Collectors.toList());
@@ -205,7 +205,8 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Override
     @Transactional(readOnly = true)
     public CarritoTemporalDto findByUsuarioAndProducto(String idUsuario, String idProducto) {
-        CarritoTemporal item = carritoRepository.findByIdUsuario_IdUsuarioAndIdProducto_IdProducto(idUsuario, idProducto);
+        CarritoTemporal item = carritoRepository.findByIdUsuario_IdUsuarioAndIdProducto_IdProducto(idUsuario,
+                idProducto);
         return item != null ? convertToDTO(item) : null;
     }
 
@@ -301,7 +302,6 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
         return carritoRepository.existsByIdUsuario_IdUsuario(idUsuario);
     }
 
-
     /**
      * Calcula el total del carrito de un usuario.
      * 
@@ -312,7 +312,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Transactional(readOnly = true)
     public BigDecimal calcularTotalCarrito(String idUsuario) {
         List<CarritoTemporalDto> items = findByUsuario(idUsuario);
-        
+
         return items.stream()
                 .map(item -> {
                     BigDecimal precio = BigDecimal.valueOf(item.getIdProductoPrecio());
@@ -334,8 +334,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
                 item.getIdProducto() != null ? item.getIdProducto().getNombre() : null,
                 item.getIdProducto() != null ? item.getIdProducto().getPrecio() : null,
                 item.getCantidad(),
-                item.getFechaAgregado()
-        );
+                item.getFechaAgregado());
     }
 
     /**
