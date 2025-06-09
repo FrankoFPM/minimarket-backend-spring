@@ -1,6 +1,7 @@
 package org.minimarket.minimarketbackendspring.services.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,21 +89,20 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido existingPedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con ID: " + id));
 
+        // Solo permitir cambios a campos NO monetarios
         if (pedidoDTO.getEstado() != null) {
             existingPedido.setEstado(pedidoDTO.getEstado());
         }
         if (pedidoDTO.getMetodoPago() != null) {
             existingPedido.setMetodoPago(pedidoDTO.getMetodoPago());
         }
-        if (pedidoDTO.getTotal() != null) {
-            existingPedido.setTotal(pedidoDTO.getTotal());
-        }
+        
+        // SOLO permitir cambio de descuento (para promociones manuales)
         if (pedidoDTO.getDescuentoAplicado() != null) {
             existingPedido.setDescuentoAplicado(pedidoDTO.getDescuentoAplicado());
         }
-        if (pedidoDTO.getImpuesto() != null) {
-            existingPedido.setImpuesto(pedidoDTO.getImpuesto());
-        }
+
+        // NO permitir cambios directos a total e impuesto - se calculan automáticamente
 
         existingPedido.setUpdatedAt(OffsetDateTime.now());
 
@@ -110,7 +110,12 @@ public class PedidoServiceImpl implements PedidoService {
         existingPedido.setUpdatedBy(updatedByUser);
 
         Pedido updatedPedido = pedidoRepository.save(existingPedido);
-        return convertToDTO(updatedPedido);
+        
+        // Recalcular totales considerando el nuevo descuento
+        actualizarTotalesPedido(id);
+        
+        // Obtener el pedido actualizado con los nuevos totales
+        return convertToDTO(pedidoRepository.findById(id).orElse(updatedPedido));
     }
 
     @Override
@@ -219,11 +224,15 @@ public class PedidoServiceImpl implements PedidoService {
                 .map(DetallePedidoDTO::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal impuesto = subtotal.multiply(BigDecimal.valueOf(0.19));
+        // Calcular impuesto con redondeo a 2 decimales
+        BigDecimal impuesto = subtotal.multiply(BigDecimal.valueOf(0.19))
+                                     .setScale(2, RoundingMode.HALF_UP);
         
+        // Calcular total con redondeo a 2 decimales
         BigDecimal total = subtotal
                 .add(impuesto)
-                .subtract(pedido.getDescuentoAplicado() != null ? pedido.getDescuentoAplicado() : BigDecimal.ZERO);
+                .subtract(pedido.getDescuentoAplicado() != null ? pedido.getDescuentoAplicado() : BigDecimal.ZERO)
+                .setScale(2, RoundingMode.HALF_UP);
         
         pedido.setTotal(total);
         pedido.setImpuesto(impuesto);
