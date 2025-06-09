@@ -10,7 +10,6 @@ import org.minimarket.minimarketbackendspring.entities.Distrito;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.repositories.DistritoRepository;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
-import org.minimarket.minimarketbackendspring.services.interfaces.DistritoService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +28,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private DistritoRepository distritoRepository;
-    @Autowired
-    private DistritoService distritoService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

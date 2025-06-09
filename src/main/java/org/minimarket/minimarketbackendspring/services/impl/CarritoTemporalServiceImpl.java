@@ -109,8 +109,6 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
                         BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
                                 item.getIdProductoIdProducto(), precioOriginal);
                         
-                        // Aquí podrías crear un CarritoTemporalConDescuentoDto si quieres más detalle
-                        // Por ahora mantenemos el DTO original
                     }
                     
                     return item;

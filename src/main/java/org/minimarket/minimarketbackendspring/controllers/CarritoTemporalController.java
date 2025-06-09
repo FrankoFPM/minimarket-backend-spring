@@ -106,4 +106,20 @@ public class CarritoTemporalController {
             @RequestParam String idProducto) {
         return ResponseEntity.ok(carritoService.existeProductoEnCarrito(idUsuario, idProducto));
     }
+
+    /**
+     * Obtiene carrito con descuentos aplicados.
+     */
+    @GetMapping("/usuario/{idUsuario}/con-descuentos")
+    public ResponseEntity<List<CarritoTemporalDto>> getCarritoConDescuentos(@PathVariable String idUsuario) {
+        return ResponseEntity.ok(carritoService.findByUsuarioConDescuentos(idUsuario));
+    }
+    
+    /**
+     * Calcula el total del carrito CON descuentos.
+     */
+    @GetMapping("/usuario/{idUsuario}/total-con-descuentos")
+    public ResponseEntity<BigDecimal> calcularTotalConDescuentos(@PathVariable String idUsuario) {
+        return ResponseEntity.ok(carritoService.calcularTotalCarritoConDescuentos(idUsuario));
+    }
 }
