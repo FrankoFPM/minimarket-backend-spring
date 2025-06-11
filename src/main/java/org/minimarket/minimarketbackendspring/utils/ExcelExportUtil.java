@@ -1,20 +1,62 @@
 package org.minimarket.minimarketbackendspring.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.minimarket.minimarketbackendspring.dtos.ProductoDTO;
 import org.minimarket.minimarketbackendspring.dtos.ProveedorDTO;
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 @Service
 public class ExcelExportUtil {
+
+    private void agregarLogo(Workbook workbook, Sheet sheet, int ultimaColumnaData) {
+        try {
+            InputStream logoStream = getClass().getResourceAsStream("/images/Logo.jpg");
+            if (logoStream != null) {
+                byte[] logoBytes = IOUtils.toByteArray(logoStream);
+                int pictureIdx = workbook.addPicture(logoBytes, Workbook.PICTURE_TYPE_JPEG);
+
+                Drawing<?> drawing = sheet.createDrawingPatriarch();
+                CreationHelper helper = workbook.getCreationHelper();
+                ClientAnchor anchor = helper.createClientAnchor();
+
+                int columnaLogo = ultimaColumnaData + 5;
+                anchor.setCol1(columnaLogo);
+                anchor.setRow1(0);
+                // 9 columnas de ancho
+                anchor.setCol2(columnaLogo + 9);
+                // 10 filas de alto
+                anchor.setRow2(10);
+
+                Picture picture = drawing.createPicture(anchor, pictureIdx);
+                picture.resize(0.5);
+
+                logoStream.close();
+            }
+        } catch (Exception e) {
+            Row logoRow = sheet.getRow(0);
+            if (logoRow == null) {
+                logoRow = sheet.createRow(0);
+            }
+            Cell logoCell = logoRow.createCell(ultimaColumnaData + 5);
+            logoCell.setCellValue("MARKET LA CASERITA");
+        }
+    }
+
     public byte[] exportarProductosAExcel(List<ProductoDTO> productos) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Productos");
@@ -44,11 +86,15 @@ public class ExcelExportUtil {
             row.createCell(7).setCellValue(p.getProveedorNombre());
         }
 
+        // Agregar logo
+        agregarLogo(workbook, sheet, 8);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         workbook.write(out);
         workbook.close();
         return out.toByteArray();
     }
+
     public byte[] exportarProveedoresAExcel(List<ProveedorDTO> proveedores) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Proveedores");
@@ -80,11 +126,15 @@ public class ExcelExportUtil {
             row.createCell(8).setCellValue(p.getUpdatedAt() != null ? p.getUpdatedAt().toString() : "");
         }
 
+        // Agregar logo
+        agregarLogo(workbook, sheet, 9);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         workbook.write(out);
         workbook.close();
         return out.toByteArray();
     }
+
     public byte[] exportarUsuariosAExcel(List<UsuarioDTO> usuarios, String nombreHoja) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(nombreHoja);
@@ -115,6 +165,9 @@ public class ExcelExportUtil {
             row.createCell(7).setCellValue(u.getRol());
             row.createCell(8).setCellValue(u.getEstado());
         }
+
+        // Agregar logo
+        agregarLogo(workbook, sheet, 9);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         workbook.write(out);
