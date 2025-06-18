@@ -32,4 +32,6 @@ public interface AuthService {
      * @throws FirebaseAuthException Si hay error en la autenticación
      */
     Usuario authenticateTraditional(String email, String password);
+
+    void syncFirebaseClaims(String uid, String rol) throws FirebaseAuthException;
 }

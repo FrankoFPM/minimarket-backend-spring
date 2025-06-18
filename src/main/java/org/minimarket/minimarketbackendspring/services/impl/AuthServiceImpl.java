@@ -1,5 +1,6 @@
 package org.minimarket.minimarketbackendspring.services.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +40,11 @@ public class AuthServiceImpl implements AuthService {
         String uid = decodedToken.getUid();
         String email = decodedToken.getEmail();
         String name = decodedToken.getName();
+
+        Map<String, Object> claims = decodedToken.getClaims();
+        for (Map.Entry<String, Object> entry : claims.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
 
         String providerId = null;
 
@@ -138,7 +144,21 @@ public class AuthServiceImpl implements AuthService {
         } else if ("facebook.com".equals(providerId)) {
             newUser.setFacebookId(uid);
         }
+        try {
+            syncFirebaseClaims(uid, newUser.getRol());
+        } catch (FirebaseAuthException e) {
+            // Manejo del error, por ejemplo, loguear la excepción
+            e.printStackTrace();
+        }
 
         return newUser;
     }
+
+    @Override
+    public void syncFirebaseClaims(String uid, String rol) throws FirebaseAuthException {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", rol);
+        firebaseAuth.setCustomUserClaims(uid, claims);
+    }
+
 }

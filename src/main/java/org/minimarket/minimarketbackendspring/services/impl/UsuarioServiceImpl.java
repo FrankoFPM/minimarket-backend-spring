@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.google.firebase.auth.FirebaseAuth;
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.entities.Distrito;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
@@ -12,6 +13,7 @@ import org.minimarket.minimarketbackendspring.repositories.DistritoRepository;
 import org.minimarket.minimarketbackendspring.repositories.UsuarioRepository;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    @Lazy
+    private AuthServiceImpl authService;
 
     /**
      * Convierte una entidad Usuario a UsuarioDTO.
@@ -219,8 +225,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         
         u.setTelefono(usuario.getTelefono());
         u.setDireccion(usuario.getDireccion());
-        u.setGoogleId(usuario.getGoogleId());
-        u.setFacebookId(usuario.getFacebookId());
+        u.setGoogleId(u.getGoogleId());
+        u.setFacebookId(u.getFacebookId());
         u.setRol(usuario.getRol());
         u.setEstado(usuario.getEstado());
 
@@ -231,6 +237,16 @@ public class UsuarioServiceImpl implements UsuarioService {
             u.setIdDistrito(distrito);
         } else {
             u.setIdDistrito(null);
+        }
+
+        try {
+            // Actualizar los claims de Firebase si el usuario tiene un ID de Google
+            if (u.getGoogleId() != null && !u.getGoogleId().isEmpty()) {
+                authService.syncFirebaseClaims(u.getGoogleId(), usuario.getRol());
+                System.out.println("Claims de Firebase sincronizados para Google ID: " + u.getGoogleId());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
         }
 
         usuarioRepository.save(u);
