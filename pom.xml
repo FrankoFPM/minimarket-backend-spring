@@ -149,12 +149,6 @@
             <artifactId>commons-codec</artifactId>
             <version>1.16.0</version>
         </dependency>
-        
-        <!-- Logback Classic - Implementación completa de logging -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
 
 	</dependencies>
 
