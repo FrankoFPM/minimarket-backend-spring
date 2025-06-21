@@ -7,6 +7,8 @@ import org.minimarket.minimarketbackendspring.dtos.requests.LoginRequestDTO;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
 import org.minimarket.minimarketbackendspring.services.interfaces.AuthService;
 import org.minimarket.minimarketbackendspring.services.interfaces.UsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 public class UsuarioController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
+    public void ejemploMetodo() {
+        logger.info("Este es un mensaje informativo");
+        logger.error("Este es un mensaje de error");
+    }
+
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
@@ -41,6 +49,7 @@ public class UsuarioController {
      */
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> getAllUsuarios() {
+        ejemploMetodo();;
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
