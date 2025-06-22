@@ -1,7 +1,7 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link org.minimarket.minimarketbackendspring.entities.CarritoTemporal}
@@ -13,12 +13,12 @@ public class CarritoTemporalDto implements Serializable {
     private String idProductoNombre;
     private Double idProductoPrecio;
     private Long cantidad;
-    private Instant fechaAgregado;
+    private LocalDateTime fechaAgregado;
 
     public CarritoTemporalDto() {
     }
 
-    public CarritoTemporalDto(Long id, String idUsuario, String idProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, Instant fechaAgregado) {
+    public CarritoTemporalDto(Long id, String idUsuario, String idProducto, String idProductoNombre, Double idProductoPrecio, Long cantidad, LocalDateTime fechaAgregado) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.idProducto = idProducto;
@@ -76,11 +76,11 @@ public class CarritoTemporalDto implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public Instant getFechaAgregado() {
+    public LocalDateTime getFechaAgregado() {
         return fechaAgregado;
     }
 
-    public void setFechaAgregado(Instant fechaAgregado) {
+    public void setFechaAgregado(LocalDateTime fechaAgregado) {
         this.fechaAgregado = fechaAgregado;
     }
 

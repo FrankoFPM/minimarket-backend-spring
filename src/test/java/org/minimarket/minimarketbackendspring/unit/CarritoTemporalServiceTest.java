@@ -2,6 +2,7 @@ package org.minimarket.minimarketbackendspring.unit;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +83,7 @@ class CarritoTemporalServiceTest {
         carritoMock.setIdUsuario(usuarioMock);
         carritoMock.setIdProducto(productoMock);
         carritoMock.setCantidad(2L);
-        carritoMock.setFechaAgregado(Instant.now());
+        carritoMock.setFechaAgregado(LocalDateTime.now());
 
         carritoDTO = new CarritoTemporalDto();
         carritoDTO.setId(1L);
@@ -91,7 +92,7 @@ class CarritoTemporalServiceTest {
         carritoDTO.setIdProductoNombre("Leche Gloria");
         carritoDTO.setIdProductoPrecio(4.50);
         carritoDTO.setCantidad(2L);
-        carritoDTO.setFechaAgregado(Instant.now());
+        carritoDTO.setFechaAgregado(LocalDateTime.now());
     }
 
     /**
