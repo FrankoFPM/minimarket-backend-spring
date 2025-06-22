@@ -3,6 +3,7 @@ package org.minimarket.minimarketbackendspring.services.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,7 +139,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
             item.setCantidad(1L);
         }
         if (item.getFechaAgregado() == null) {
-            item.setFechaAgregado(Instant.now());
+            item.setFechaAgregado(LocalDateTime.now());
         }
 
         CarritoTemporal savedItem = carritoRepository.save(item);
