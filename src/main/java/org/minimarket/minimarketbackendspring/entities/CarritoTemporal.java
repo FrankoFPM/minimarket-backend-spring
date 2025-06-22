@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "CARRITO_TEMPORAL")
@@ -30,7 +31,7 @@ public class CarritoTemporal {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "FECHA_AGREGADO")
-    private Instant fechaAgregado;
+    private LocalDateTime fechaAgregado;
 
     public Long getId() {
         return id;
@@ -64,11 +65,11 @@ public class CarritoTemporal {
         this.cantidad = cantidad;
     }
 
-    public Instant getFechaAgregado() {
+    public LocalDateTime getFechaAgregado() {
         return fechaAgregado;
     }
 
-    public void setFechaAgregado(Instant fechaAgregado) {
+    public void setFechaAgregado(LocalDateTime fechaAgregado) {
         this.fechaAgregado = fechaAgregado;
     }
 

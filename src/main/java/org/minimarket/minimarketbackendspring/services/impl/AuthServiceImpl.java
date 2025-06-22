@@ -67,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
             // Actualizar IDs de proveedores si es necesario
             updateSocialProviderIds(usuDTO, uid, providerId);
             usuarioService.update(usuDTO);
+            syncFirebaseClaims(uid, usuDTO.getRol());
             return usuDTO;
         } else {
             // Crear nuevo usuario
@@ -113,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
      */
     private UsuarioDTO createNewSocialUser(String email, String name, String uid, String providerId) {
         UsuarioDTO newUser = new UsuarioDTO();
-        newUser.setId(UUID.randomUUID().toString());
+        newUser.setId(uid);
         newUser.setEmail(email);
 
         // Dividir el nombre completo en fragmentos
@@ -159,6 +160,7 @@ public class AuthServiceImpl implements AuthService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", rol);
         firebaseAuth.setCustomUserClaims(uid, claims);
+        System.out.println("Claims sincronizados para el usuario con UID: " + uid + ", rol: " + rol);
     }
 
 }

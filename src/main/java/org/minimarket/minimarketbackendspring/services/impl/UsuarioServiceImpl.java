@@ -225,9 +225,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         
         u.setTelefono(usuario.getTelefono());
         u.setDireccion(usuario.getDireccion());
-        u.setGoogleId(u.getGoogleId());
-        u.setFacebookId(u.getFacebookId());
         u.setRol(usuario.getRol());
+        System.out.println("Actualizando usuario con ID: " + usuario.getId() + " y rol: " + usuario.getRol());
         u.setEstado(usuario.getEstado());
 
         // Actualizar distrito si se proporciona ID
@@ -240,11 +239,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         try {
-            // Actualizar los claims de Firebase si el usuario tiene un ID de Google
-            if (u.getGoogleId() != null && !u.getGoogleId().isEmpty()) {
-                authService.syncFirebaseClaims(u.getGoogleId(), usuario.getRol());
-                System.out.println("Claims de Firebase sincronizados para Google ID: " + u.getGoogleId());
-            }
+            authService.syncFirebaseClaims(usuario.getId(), usuario.getRol());
         } catch (Exception e) {
             throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
         }
