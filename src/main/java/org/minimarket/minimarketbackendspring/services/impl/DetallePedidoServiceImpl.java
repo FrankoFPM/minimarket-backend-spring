@@ -244,7 +244,10 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
                         ? detalle.getIdPedido().getIdUsuario().getNombre() : null,
                 detalle.getIdPedido() != null && detalle.getIdPedido().getIdUsuario() != null
                         ? detalle.getIdPedido().getIdUsuario().getApellido() : null,
+                detalle.getIdProducto() != null ? detalle.getIdProducto().getIdProducto() : null,
                 detalle.getIdProducto() != null ? detalle.getIdProducto().getNombre() : null,
+                detalle.getIdProducto() != null ? detalle.getIdProducto().getFoto() : null,
+                detalle.getIdProducto() != null ? detalle.getIdProducto().getDescripcion() : null,
                 detalle.getCantidad(),
                 detalle.getPrecioUnitario(),
                 detalle.getSubtotal()
