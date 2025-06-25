@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.minimarket.minimarketbackendspring.dtos.CarritoTemporalDto;
 import org.minimarket.minimarketbackendspring.services.interfaces.CarritoTemporalService;
+import org.minimarket.minimarketbackendspring.utils.PDFExportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/carrito")
-@CrossOrigin(origins = {"http://localhost:3000"})
+@CrossOrigin(origins = { "http://localhost:3000" })
 public class CarritoTemporalController {
 
     @Autowired
@@ -46,7 +48,8 @@ public class CarritoTemporalController {
      */
     @PostMapping("/agregar")
     public ResponseEntity<CarritoTemporalDto> agregarProducto(@RequestBody CarritoTemporalDto dto) {
-        CarritoTemporalDto item = carritoService.agregarProductoAlCarrito(dto.getIdUsuario(), dto.getIdProducto(), dto.getCantidad());
+        CarritoTemporalDto item = carritoService.agregarProductoAlCarrito(dto.getIdUsuario(), dto.getIdProducto(),
+                dto.getCantidad());
         return ResponseEntity.status(HttpStatus.CREATED).body(item);
     }
 
@@ -115,7 +118,7 @@ public class CarritoTemporalController {
     public ResponseEntity<List<CarritoTemporalDto>> getCarritoConDescuentos(@PathVariable String idUsuario) {
         return ResponseEntity.ok(carritoService.findByUsuarioConDescuentos(idUsuario));
     }
-    
+
     /**
      * Calcula el total del carrito CON descuentos.
      */
@@ -125,7 +128,7 @@ public class CarritoTemporalController {
     }
 
     /**
-        * abre en nueva pestaña el PDF de la boleta generada
+     * abre en nueva pestaña el PDF de la boleta generada
      */
 
     @GetMapping("/boleta/{idUsuario}")
@@ -133,23 +136,23 @@ public class CarritoTemporalController {
         try {
             String numeroTransaccion = "BOL-" + System.currentTimeMillis();
             List<CarritoTemporalDto> items = carritoService.findByUsuarioConDescuentos(idUsuario);
-            
+
             if (items.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            
+
             byte[] pdfBytes = pdfExportUtil.exportarBoletaPDF(items, idUsuario, numeroTransaccion);
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.builder("inline")
                     .filename("boleta-" + numeroTransaccion + ".pdf")
                     .build());
-            
+
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(pdfBytes);
-                    
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
