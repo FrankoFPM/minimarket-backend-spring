@@ -3,7 +3,6 @@ package org.minimarket.minimarketbackendspring.controllers;
 import java.util.List;
 
 import org.minimarket.minimarketbackendspring.dtos.ProductoDTO;
-import org.minimarket.minimarketbackendspring.entities.Producto;
 import org.minimarket.minimarketbackendspring.services.interfaces.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -122,6 +121,16 @@ public class ProductoController {
     public ResponseEntity<Void> deleteProducto(@PathVariable String id) {
         productoService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+        * Obtiene productos con stock bajo.
+        *
+        * @return una lista de productos con stock bajo
+    */
+    @GetMapping("/alerta-stock")
+    public ResponseEntity<List<ProductoDTO>> getProductosConStockBajo() {
+        return ResponseEntity.ok(productoService.findProductosConStockBajo());
     }
 
 }

@@ -219,4 +219,20 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setEstado("inactivo");
         productoRepository.save(producto);
     }
+
+    /**
+        * Obtiene productos con stock bajo (5 o menos unidades).
+        *
+        * @return una lista de productos con stock bajo
+     */
+    @Override
+    public List<ProductoDTO> findProductosConStockBajo() {
+        List<Producto> productos = productoRepository.findByStockLessThanEqual(LOW_STOCK_THRESHOLD);
+        return productos.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Constant for low stock threshold
+    private static final long LOW_STOCK_THRESHOLD = 5L;
 }
