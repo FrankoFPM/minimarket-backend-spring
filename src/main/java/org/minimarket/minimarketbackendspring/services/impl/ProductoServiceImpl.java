@@ -227,9 +227,12 @@ public class ProductoServiceImpl implements ProductoService {
      */
     @Override
     public List<ProductoDTO> findProductosConStockBajo() {
-        List<Producto> productos = productoRepository.findByStockLessThanEqual(5L);
+        List<Producto> productos = productoRepository.findByStockLessThanEqual(LOW_STOCK_THRESHOLD);
         return productos.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // Constant for low stock threshold
+    private static final long LOW_STOCK_THRESHOLD = 5L;
 }
