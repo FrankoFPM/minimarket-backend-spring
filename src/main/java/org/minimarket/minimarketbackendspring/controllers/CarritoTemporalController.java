@@ -30,6 +30,9 @@ public class CarritoTemporalController {
     @Autowired
     private CarritoTemporalService carritoService;
 
+    @Autowired
+    private PDFExportUtil pdfExportUtil;
+
     /**
      * Obtiene todos los items del carrito de un usuario.
      */
@@ -119,5 +122,37 @@ public class CarritoTemporalController {
     @GetMapping("/usuario/{idUsuario}/total-con-descuentos")
     public ResponseEntity<BigDecimal> calcularTotalConDescuentos(@PathVariable String idUsuario) {
         return ResponseEntity.ok(carritoService.calcularTotalCarritoConDescuentos(idUsuario));
+    }
+
+    /**
+        * abre en nueva pestaña el PDF de la boleta generada
+     */
+
+    @GetMapping("/boleta/{idUsuario}")
+    public ResponseEntity<byte[]> generarBoletaBonita(@PathVariable String idUsuario) {
+        try {
+            String numeroTransaccion = "BOL-" + System.currentTimeMillis();
+            List<CarritoTemporalDto> items = carritoService.findByUsuarioConDescuentos(idUsuario);
+            
+            if (items.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            byte[] pdfBytes = pdfExportUtil.exportarBoletaPDF(items, idUsuario, numeroTransaccion);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("inline")
+                    .filename("boleta-" + numeroTransaccion + ".pdf")
+                    .build());
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+                    
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
