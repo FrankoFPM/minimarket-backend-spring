@@ -1,6 +1,7 @@
 package org.minimarket.minimarketbackendspring.dtos;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -14,6 +15,12 @@ public class CarritoTemporalDto implements Serializable {
     private Double idProductoPrecio;
     private Long cantidad;
     private LocalDateTime fechaAgregado;
+    
+    private BigDecimal precioOriginal;
+    private BigDecimal montoDescuento;
+    private BigDecimal porcentajeDescuento;
+    private Boolean tieneDescuento;
+    private BigDecimal precioConDescuento;
 
     public CarritoTemporalDto() {
     }
@@ -26,6 +33,11 @@ public class CarritoTemporalDto implements Serializable {
         this.idProductoPrecio = idProductoPrecio;
         this.cantidad = cantidad;
         this.fechaAgregado = fechaAgregado;
+        this.tieneDescuento = false;
+        this.montoDescuento = BigDecimal.ZERO;
+        this.porcentajeDescuento = BigDecimal.ZERO;
+        this.precioOriginal = idProductoPrecio != null ? BigDecimal.valueOf(idProductoPrecio) : BigDecimal.ZERO;
+        this.precioConDescuento = this.precioOriginal;
     }
 
     public Long getId() {
@@ -84,6 +96,46 @@ public class CarritoTemporalDto implements Serializable {
         this.fechaAgregado = fechaAgregado;
     }
 
+    public BigDecimal getPrecioOriginal() {
+        return precioOriginal;
+    }
+
+    public void setPrecioOriginal(BigDecimal precioOriginal) {
+        this.precioOriginal = precioOriginal;
+    }
+
+    public BigDecimal getMontoDescuento() {
+        return montoDescuento;
+    }
+
+    public void setMontoDescuento(BigDecimal montoDescuento) {
+        this.montoDescuento = montoDescuento;
+    }
+
+    public BigDecimal getPorcentajeDescuento() {
+        return porcentajeDescuento;
+    }
+
+    public void setPorcentajeDescuento(BigDecimal porcentajeDescuento) {
+        this.porcentajeDescuento = porcentajeDescuento;
+    }
+
+    public BigDecimal getPrecioConDescuento() {
+        return precioConDescuento;
+    }
+
+    public void setPrecioConDescuento(BigDecimal precioConDescuento) {
+        this.precioConDescuento = precioConDescuento;
+    }
+
+    public Boolean getTieneDescuento() {
+        return tieneDescuento;
+    }
+
+    public void setTieneDescuento(Boolean tieneDescuento) {
+        this.tieneDescuento = tieneDescuento;
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
@@ -93,6 +145,11 @@ public class CarritoTemporalDto implements Serializable {
                 "idProductoNombre = " + idProductoNombre + ", " +
                 "idProductoPrecio = " + idProductoPrecio + ", " +
                 "cantidad = " + cantidad + ", " +
-                "fechaAgregado = " + fechaAgregado + ")";
+                "fechaAgregado = " + fechaAgregado + ", " +
+                "tieneDescuento = " + tieneDescuento + ", " +
+                "precioOriginal = " + precioOriginal + ", " +
+                "precioConDescuento = " + precioConDescuento + ", " +
+                "montoDescuento = " + montoDescuento + ", " +
+                "porcentajeDescuento = " + porcentajeDescuento + ")";
     }
 }
