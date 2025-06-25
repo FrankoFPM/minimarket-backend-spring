@@ -2,7 +2,6 @@ package org.minimarket.minimarketbackendspring.services.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,19 +70,16 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Override
     @Transactional(readOnly = true)
     public BigDecimal calcularTotalCarritoConDescuentos(String idUsuario) {
-        List<CarritoTemporalDto> items = findByUsuario(idUsuario);
+        List<CarritoTemporalDto> itemsConDescuentos = findByUsuarioConDescuentos(idUsuario);
 
-        return items.stream()
+        return itemsConDescuentos.stream()
                 .map(item -> {
-                    // Precio original del producto
-                    BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
+                    BigDecimal precioEfectivo = item.getPrecioConDescuento() != null ? 
+                            item.getPrecioConDescuento() : BigDecimal.valueOf(item.getIdProductoPrecio());
+                    
                     BigDecimal cantidad = BigDecimal.valueOf(item.getCantidad());
-
-                    // Aplicar descuentos si existen
-                    BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
-                            item.getIdProducto(), precioOriginal);
-
-                    return precioConDescuento.multiply(cantidad);
+                    
+                    return precioEfectivo.multiply(cantidad);
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
@@ -102,14 +98,35 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
                 .map(item -> {
                     // Verificar si tiene descuentos activos
                     boolean tieneDescuento = descuentoService.tieneDescuentosActivos(item.getIdProducto());
+                    
+                    Double precioOriginal = item.getIdProductoPrecio();
+                    
+                    item.setPrecioOriginal(BigDecimal.valueOf(precioOriginal));
+                    item.setTieneDescuento(tieneDescuento);
 
                     if (tieneDescuento) {
-                        BigDecimal precioOriginal = BigDecimal.valueOf(item.getIdProductoPrecio());
+                        BigDecimal precioOriginalBD = BigDecimal.valueOf(precioOriginal);
                         BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
-                                item.getIdProducto(), precioOriginal);
-                        // TODO: Asignar el precioConDescuento al DTO cuando se agregue el campo
-                        // correspondiente
-
+                                item.getIdProducto(), precioOriginalBD);
+                        
+                        // Calcular información de descuento
+                        BigDecimal montoDescuentoBD = precioOriginalBD.subtract(precioConDescuento);
+                        BigDecimal porcentajeDescuentoBD = montoDescuentoBD
+                                .divide(precioOriginalBD, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(100))
+                                .setScale(2, RoundingMode.HALF_UP);
+                        
+                        // USAR BigDecimal directamente (sin conversiones)
+                        item.setPrecioOriginal(precioOriginalBD);
+                        item.setPrecioConDescuento(precioConDescuento);
+                        item.setMontoDescuento(montoDescuentoBD);
+                        item.setPorcentajeDescuento(porcentajeDescuentoBD);
+                    } else {
+                        // Sin descuento
+                        item.setPrecioOriginal(BigDecimal.valueOf(precioOriginal));
+                        item.setPrecioConDescuento(BigDecimal.valueOf(precioOriginal));
+                        item.setMontoDescuento(BigDecimal.ZERO);
+                        item.setPorcentajeDescuento(BigDecimal.ZERO);
                     }
 
                     return item;
