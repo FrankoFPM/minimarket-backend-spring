@@ -101,7 +101,6 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
                     
                     Double precioOriginal = item.getIdProductoPrecio();
                     
-                    item.setPrecioOriginal(BigDecimal.valueOf(precioOriginal));
                     item.setTieneDescuento(tieneDescuento);
 
                     if (tieneDescuento) {
