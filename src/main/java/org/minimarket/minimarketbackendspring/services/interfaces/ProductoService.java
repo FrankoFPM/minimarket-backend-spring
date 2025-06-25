@@ -69,4 +69,11 @@ public interface ProductoService {
      * @param id
      */
     void delete(String id);
+
+    /**
+        * Obtiene productos con stock bajo.
+        *
+        * @return una lista de productos con stock bajo
+    */
+    List<ProductoDTO> findProductosConStockBajo();
 }
