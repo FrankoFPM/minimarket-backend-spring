@@ -35,4 +35,12 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
      */
     List<Producto> findByIdProveedor_Id(Long idProveedor);
 
+    /**
+        * Encuentra productos con stock menor o igual a 5 unidades.
+        *
+        * @param stock el valor límite de stock
+        * @return lista de productos con stock bajo
+    */
+    List<Producto> findByStockLessThanEqual(Long stock);
+
 }
