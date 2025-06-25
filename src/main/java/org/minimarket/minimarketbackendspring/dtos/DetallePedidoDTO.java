@@ -11,7 +11,10 @@ public class DetallePedidoDTO implements Serializable {
     private Long idPedidoId;
     private String idPedidoIdUsuarioNombre;
     private String idPedidoIdUsuarioApellido;
+    private String idProducto;
     private String idProductoNombre;
+    private String idProductoFoto;
+    private String idProductoDescripcion;
     private Long cantidad;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;
@@ -19,12 +22,15 @@ public class DetallePedidoDTO implements Serializable {
     public DetallePedidoDTO() {
     }
 
-    public DetallePedidoDTO(Long id, Long idPedidoId, String idPedidoIdUsuarioNombre, String idPedidoIdUsuarioApellido, String idProductoNombre, Long cantidad, BigDecimal precioUnitario, BigDecimal subtotal) {
+    public DetallePedidoDTO(Long id, Long idPedidoId, String idPedidoIdUsuarioNombre, String idPedidoIdUsuarioApellido, String idProducto, String idProductoNombre, String idProductoFoto, String idProductoDescripcion, Long cantidad, BigDecimal precioUnitario, BigDecimal subtotal) {
         this.id = id;
         this.idPedidoId = idPedidoId;
         this.idPedidoIdUsuarioNombre = idPedidoIdUsuarioNombre;
         this.idPedidoIdUsuarioApellido = idPedidoIdUsuarioApellido;
+        this.idProducto = idProducto;
         this.idProductoNombre = idProductoNombre;
+        this.idProductoFoto = idProductoFoto;
+        this.idProductoDescripcion = idProductoDescripcion;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.subtotal = subtotal;
@@ -92,6 +98,30 @@ public class DetallePedidoDTO implements Serializable {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public String getIdProducto() {
+        return idProducto;
+    }
+
+    public void setIdProducto(String idProducto) {
+        this.idProducto = idProducto;
+    }
+
+    public String getIdProductoFoto() {
+        return idProductoFoto;
+    }
+
+    public void setIdProductoFoto(String idProductoFoto) {
+        this.idProductoFoto = idProductoFoto;
+    }
+
+    public String getIdProductoDescripcion() {
+        return idProductoDescripcion;
+    }
+
+    public void setIdProductoDescripcion(String idProductoDescripcion) {
+        this.idProductoDescripcion = idProductoDescripcion;
     }
 
     @Override
