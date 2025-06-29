@@ -2,11 +2,13 @@ package org.minimarket.minimarketbackendspring.controllers;
 
 import java.util.List;
 
+import org.minimarket.minimarketbackendspring.dtos.DetallePedidoDTO;
 import org.minimarket.minimarketbackendspring.dtos.PedidoDTO;
+import org.minimarket.minimarketbackendspring.services.interfaces.DetallePedidoService;
 import org.minimarket.minimarketbackendspring.services.interfaces.PedidoService;
+import org.minimarket.minimarketbackendspring.utils.PDFExportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +32,13 @@ import jakarta.persistence.EntityNotFoundException;
 public class PedidoController {
 
     @Autowired
+    private PDFExportUtil pdfExportUtil;
+
+    @Autowired
     private PedidoService pedidoService;
+
+    @Autowired
+    private DetallePedidoService detallePedidoService;
 
     /**
      * Obtiene todos los pedidos.
@@ -190,5 +198,34 @@ public class PedidoController {
     public ResponseEntity<Void> deletePedido(@PathVariable Long id) {
         pedidoService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/boleta/{idBoleta}/{idUsuario}")
+    public ResponseEntity<byte[]> generarBoletaBonita(@PathVariable String idBoleta,
+                                                      @PathVariable String idUsuario) {
+        try {
+            String numeroTransaccion = "BOL-" + System.currentTimeMillis();
+            List<DetallePedidoDTO> items = detallePedidoService.findByPedidoId(Long.parseLong(idBoleta));
+
+            if (items.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            byte[] pdfBytes = pdfExportUtil.exportarBoletaFromPedidoPDF(items, idUsuario, numeroTransaccion);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("inline")
+                    .filename("boleta-" + numeroTransaccion + ".pdf")
+                    .build());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
