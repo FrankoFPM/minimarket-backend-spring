@@ -154,16 +154,26 @@ public class PedidoController {
     }
 
     /**
-     * Cambia el estado de un pedido.
+     * Actualiza solo el estado de un pedido.
      *
      * @param id el identificador del pedido
-     * @param nuevoEstado el nuevo estado del pedido
+     * @param nuevoEstado el nuevo estado a asignar
      * @return el objeto PedidoDTO actualizado
      */
     @PatchMapping("/{id}/estado")
-    public ResponseEntity<PedidoDTO> cambiarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
-        PedidoDTO pedido = pedidoService.cambiarEstado(id, nuevoEstado);
-        return ResponseEntity.ok(pedido);
+    public ResponseEntity<PedidoDTO> actualizarEstadoPedido(
+            @PathVariable Long id,
+            @RequestParam String nuevoEstado) {
+        try {
+            PedidoDTO pedidoActualizado = pedidoService.cambiarEstado(id, nuevoEstado);
+            return ResponseEntity.ok(pedidoActualizado);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**

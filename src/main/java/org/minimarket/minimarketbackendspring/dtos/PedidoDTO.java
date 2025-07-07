@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
  */
 public class PedidoDTO implements Serializable {
     private Long id;
+    private String idUsuarioIdUsuario;
     private String idUsuarioNombre;
     private String idUsuarioApellido;
     private OffsetDateTime fechaPedido;
@@ -21,8 +22,9 @@ public class PedidoDTO implements Serializable {
     private OffsetDateTime updatedAt;
     private Long comprobanteId;
 
-    public PedidoDTO(Long id, String idUsuarioNombre, String idUsuarioApellido, OffsetDateTime fechaPedido, String estado, String metodoPago, BigDecimal total, BigDecimal descuentoAplicado, BigDecimal impuesto, OffsetDateTime createdAt, OffsetDateTime updatedAt, Long comprobanteId) {
+    public PedidoDTO(Long id, String idUsuarioIdUsuario, String idUsuarioNombre, String idUsuarioApellido, OffsetDateTime fechaPedido, String estado, String metodoPago, BigDecimal total, BigDecimal descuentoAplicado, BigDecimal impuesto, OffsetDateTime createdAt, OffsetDateTime updatedAt, Long comprobanteId) {
         this.id = id;
+        this.idUsuarioIdUsuario = idUsuarioIdUsuario;
         this.idUsuarioNombre = idUsuarioNombre;
         this.idUsuarioApellido = idUsuarioApellido;
         this.fechaPedido = fechaPedido;
@@ -147,5 +149,13 @@ public class PedidoDTO implements Serializable {
                 "createdAt = " + createdAt + ", " +
                 "updatedAt = " + updatedAt + ", " +
                 "comprobanteId = " + comprobanteId + ")";
+    }
+
+    public String getIdUsuarioIdUsuario() {
+        return idUsuarioIdUsuario;
+    }
+
+    public void setIdUsuarioIdUsuario(String idUsuarioIdUsuario) {
+        this.idUsuarioIdUsuario = idUsuarioIdUsuario;
     }
 }

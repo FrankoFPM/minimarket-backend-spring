@@ -287,19 +287,17 @@ public class PedidoServiceImpl implements PedidoService {
         // Obtener todos los detalles del pedido
         List<DetallePedidoDTO> detalles = detallePedidoService.findByPedidoId(idPedido);
         
-        // Calcular subtotal sumando todos los subtotales de detalles
+        // Calcular subtotal sumando todos los subtotales de detalles (ya incluyen IGV)
         BigDecimal subtotal = detalles.stream()
                 .map(DetallePedidoDTO::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        // Calcular impuesto del 18% sobre subtotal con redondeo correcto
+        // Extraer IGV incluido: IGV = subtotal * 0.18 / 1.18
         BigDecimal impuesto = subtotal.multiply(BigDecimal.valueOf(0.18))
-                                     .setScale(2, RoundingMode.HALF_UP);
-        // Calcular total final: subtotal + impuesto
-        BigDecimal total = subtotal
-                .add(impuesto)
-                .setScale(2, RoundingMode.HALF_UP);
-        
+                                      .divide(BigDecimal.valueOf(1.18), 2, RoundingMode.HALF_UP);
+        // El total es igual al subtotal (ya incluye IGV)
+        BigDecimal total = subtotal.setScale(2, RoundingMode.HALF_UP);
+
         // Actualizar campos calculados
         pedido.setTotal(total);
         pedido.setImpuesto(impuesto);
@@ -370,6 +368,7 @@ public class PedidoServiceImpl implements PedidoService {
     private PedidoDTO convertToDTO(Pedido pedido) {
         return new PedidoDTO(
                 pedido.getId(),
+                pedido.getIdUsuario() != null ? pedido.getIdUsuario().getIdUsuario() : null,
                 pedido.getIdUsuario() != null ? pedido.getIdUsuario().getNombre() : null,
                 pedido.getIdUsuario() != null ? pedido.getIdUsuario().getApellido() : null,
                 pedido.getFechaPedido(),
@@ -437,3 +436,4 @@ public class PedidoServiceImpl implements PedidoService {
         }
     }
 }
+
