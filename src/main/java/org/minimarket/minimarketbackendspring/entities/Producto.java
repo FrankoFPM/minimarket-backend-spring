@@ -7,6 +7,7 @@ import org.hibernate.annotations.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import java.util.UUID;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
@@ -17,8 +18,13 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "PRODUCTOS")
 public class Producto {
+
+    //Constructor par Seetear el ID
+    public Producto() {
+        this.idProducto = UUID.randomUUID().toString().replace("-", "");
+    }
+
     @Id
-    @ColumnDefault("RAWTOHEX(SYS_GUID())")
     @Column(name = "ID_PRODUCTO", nullable = false, length = 36)
     private String idProducto;
 
@@ -37,7 +43,7 @@ public class Producto {
 
     @Column(name = "FOTO", length = 100)
     private String foto;
-
+    
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "ID_CATEGORIA", nullable = false)
@@ -71,7 +77,7 @@ public class Producto {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "UPDATE_BY")
     private Usuario updateBy;
-
+    
     public String getIdProducto() {
         return idProducto;
     }
