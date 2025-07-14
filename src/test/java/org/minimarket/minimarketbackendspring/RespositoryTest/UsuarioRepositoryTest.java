@@ -27,33 +27,34 @@ public class UsuarioRepositoryTest {
 
     @Test
     void guradarYRecuperarUsuarioporEmail() {
-        // Crear Usuario para pruebas
-        Usuario user = new Usuario();
-        user.setIdUsuario("OEZX7S1NZTZvG6pToEPDEdtl1dz1"); // Firebase UID simulado
-        
-        user.setEmail("miuser@correo.com");
-        user.setRol("admin");
-        usuarioRepository.save(user);
+        Usuario usuario = new Usuario();
+        usuario.setIdUsuario("OEZX7S1NZTZvG6pToEPDEdtl1dz1");
+        usuario.setNombre("NombreTest");
+        usuario.setApellido("ApellidoTest");
+        usuario.setEmail("miuser@correo.com");
+        usuario.setRol("admin");
+        usuario.setEstado("activo");
+        usuarioRepository.save(usuario);
 
         Optional<Usuario> encontrado = usuarioRepository.findByEmail("miuser@correo.com");
 
         assertTrue(encontrado.isPresent());
-        assertEquals("OEZX7SINZTgV6pToEPdEtld1dz1", encontrado.get().getIdUsuario());
+        assertEquals(usuario.getIdUsuario(), encontrado.get().getIdUsuario());
     }
 
     @Test
     void noDebeEncontrarConSqlInjectionSimulada() {
         Usuario usuario = new Usuario();
         usuario.setIdUsuario("OEZX7SINZTgV6pToEPdEtld1dab");
-        usuario.setEmail("seguro@example.com");
-        usuario.setRol("cliente");
+        usuario.setNombre("NombreFake");
+        usuario.setApellido("ApellidoFake");
+        usuario.setEmail("100%RealNoFake@example.com");
+        usuario.setRol("admin");
+        usuario.setEstado("activo");
         usuarioRepository.save(usuario);
 
-        // Intento malicioso con una condición falsa
         Optional<Usuario> resultado = usuarioRepository.findByEmail("seguro@example.com' OR '1' = '1'");
-
-        // JPA usa parámetros, no concatena SQL, por eso no encuentra nada
-        assertFalse(resultado.isPresent(), "Debe devolver vacío. JPA evita la inyección SQL.");
+        assertFalse(resultado.isPresent(), "JPA evita la inyección SQL.");
     }
 
 }
