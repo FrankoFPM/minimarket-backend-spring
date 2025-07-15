@@ -94,6 +94,11 @@ public class AuthServiceImpl implements AuthService {
                     return usuario;
                 }
             }
+            try {
+                syncFirebaseClaims(usuario.getIdUsuario(), usuario.getRol());
+            } catch (FirebaseAuthException e) {
+                throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
+            }
         }
         return null;
     }
@@ -149,8 +154,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             syncFirebaseClaims(uid, newUser.getRol());
         } catch (FirebaseAuthException e) {
-            // Manejo del error, por ejemplo, loguear la excepción
-            e.printStackTrace();
+            throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
         }
 
         return newUser;

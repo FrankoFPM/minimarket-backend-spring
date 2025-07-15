@@ -201,6 +201,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             u.setIdDistrito(distrito);
         }
 
+        try {
+            authService.syncFirebaseClaims(usuario.getId(), usuario.getRol());
+        } catch (Exception e) {
+            throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
+        }
+
         usuarioRepository.save(u);
     }
 
