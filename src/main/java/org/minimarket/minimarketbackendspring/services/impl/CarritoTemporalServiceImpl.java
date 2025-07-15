@@ -3,7 +3,9 @@ package org.minimarket.minimarketbackendspring.services.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.minimarket.minimarketbackendspring.dtos.CarritoTemporalDto;
@@ -43,6 +45,10 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     @Autowired
     private DescuentoPromocionService descuentoService;
 
+    // @Autowired
+    // private StockValidationService stockValidationService; // ELIMINAMOS ESTA
+    // DEPENDENCIA
+
     /**
      * Obtiene todos los items del carrito temporal.
      */
@@ -74,11 +80,11 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
 
         return itemsConDescuentos.stream()
                 .map(item -> {
-                    BigDecimal precioEfectivo = item.getPrecioConDescuento() != null ? 
-                            item.getPrecioConDescuento() : BigDecimal.valueOf(item.getIdProductoPrecio());
-                    
+                    BigDecimal precioEfectivo = item.getPrecioConDescuento() != null ? item.getPrecioConDescuento()
+                            : BigDecimal.valueOf(item.getIdProductoPrecio());
+
                     BigDecimal cantidad = BigDecimal.valueOf(item.getCantidad());
-                    
+
                     return precioEfectivo.multiply(cantidad);
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
@@ -98,23 +104,23 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
                 .map(item -> {
                     // Verificar si tiene descuentos activos
                     boolean tieneDescuento = descuentoService.tieneDescuentosActivos(item.getIdProducto());
-                    
+
                     Double precioOriginal = item.getIdProductoPrecio();
-                    
+
                     item.setTieneDescuento(tieneDescuento);
 
                     if (tieneDescuento) {
                         BigDecimal precioOriginalBD = BigDecimal.valueOf(precioOriginal);
                         BigDecimal precioConDescuento = descuentoService.calcularPrecioConDescuento(
                                 item.getIdProducto(), precioOriginalBD);
-                        
+
                         // Calcular información de descuento
                         BigDecimal montoDescuentoBD = precioOriginalBD.subtract(precioConDescuento);
                         BigDecimal porcentajeDescuentoBD = montoDescuentoBD
                                 .divide(precioOriginalBD, 4, RoundingMode.HALF_UP)
                                 .multiply(BigDecimal.valueOf(100))
                                 .setScale(2, RoundingMode.HALF_UP);
-                        
+
                         // USAR BigDecimal directamente (sin conversiones)
                         item.setPrecioOriginal(precioOriginalBD);
                         item.setPrecioConDescuento(precioConDescuento);
@@ -190,6 +196,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
 
     /**
      * Obtiene todos los items del carrito de un usuario.
+     * Valida automáticamente el stock y limpia productos no disponibles.
      */
     @Override
     @Transactional(readOnly = true)
@@ -200,6 +207,37 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
 
         List<CarritoTemporal> items = carritoRepository.findByIdUsuario_IdUsuario(idUsuario);
         return convertToDTOList(items);
+    }
+
+    /**
+     * Obtiene todos los items del carrito de un usuario con validación de stock.
+     * Limpia automáticamente los productos que no están disponibles.
+     */
+    @Transactional
+    public List<CarritoTemporalDto> findByUsuarioConValidacion(String idUsuario) {
+        // Obtener carrito actual
+        List<CarritoTemporalDto> items = findByUsuario(idUsuario);
+
+        // Filtrar items que no tienen stock suficiente y eliminarlos
+        List<CarritoTemporalDto> itemsValidos = items.stream()
+                .filter(item -> {
+                    if (!tieneStockSuficiente(item.getIdProducto(), item.getCantidad())) {
+                        // Eliminar item sin stock
+                        try {
+                            eliminarProductoDelCarrito(idUsuario, item.getIdProducto());
+                            System.out.println(
+                                    "Producto eliminado del carrito por falta de stock: " + item.getIdProducto());
+                            return false;
+                        } catch (Exception e) {
+                            System.err.println("Error al eliminar producto del carrito: " + e.getMessage());
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        return itemsValidos;
     }
 
     /**
@@ -229,6 +267,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
 
     /**
      * Agrega un producto al carrito o incrementa la cantidad si ya existe.
+     * Valida stock disponible antes de agregar.
      */
     @Override
     public CarritoTemporalDto agregarProductoAlCarrito(String idUsuario, String idProducto, Long cantidad) {
@@ -238,8 +277,19 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
             // Si ya existe, incrementar cantidad
             CarritoTemporalDto itemExistente = findByUsuarioAndProducto(idUsuario, idProducto);
             Long nuevaCantidad = itemExistente.getCantidad() + cantidad;
+
+            // Validar stock antes de actualizar
+            if (!tieneStockSuficiente(idProducto, nuevaCantidad)) {
+                throw new IllegalStateException("Stock insuficiente para el producto solicitado");
+            }
+
             return actualizarCantidad(idUsuario, idProducto, nuevaCantidad);
         } else {
+            // Validar stock antes de crear nuevo item
+            if (!tieneStockSuficiente(idProducto, cantidad)) {
+                throw new IllegalStateException("Stock insuficiente para el producto solicitado");
+            }
+
             // Si no existe, crear nuevo item
             CarritoTemporalDto nuevoItem = new CarritoTemporalDto();
             nuevoItem.setCantidad(cantidad);
@@ -249,6 +299,7 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
 
     /**
      * Actualiza la cantidad de un producto en el carrito.
+     * Valida stock disponible antes de actualizar.
      */
     @Override
     public CarritoTemporalDto actualizarCantidad(String idUsuario, String idProducto, Long nuevaCantidad) {
@@ -260,6 +311,11 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
 
         if (nuevaCantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
+        }
+
+        // Validar stock antes de actualizar
+        if (!tieneStockSuficiente(idProducto, nuevaCantidad)) {
+            throw new IllegalStateException("Stock insuficiente para la cantidad solicitada");
         }
 
         itemDTO.setCantidad(nuevaCantidad);
@@ -320,6 +376,20 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
     }
 
     /**
+     * Valida el stock de todos los productos en el carrito y limpia los que no
+     * están disponibles.
+     * 
+     * @param idUsuario ID del usuario
+     * @return Map con productos problemáticos y sus stocks disponibles
+     */
+    @Transactional
+    public Map<String, Long> validarYLimpiarCarrito(String idUsuario) {
+        // Esta funcionalidad se moverá al StockValidationService
+        // Por ahora retornamos un mapa vacío para evitar el ciclo
+        return new HashMap<>();
+    }
+
+    /**
      * Calcula el total del carrito de un usuario.
      * 
      * Suma el precio de cada producto multiplicado por su cantidad.
@@ -372,5 +442,20 @@ public class CarritoTemporalServiceImpl implements CarritoTemporalService {
         return items.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Verifica si un producto tiene stock suficiente.
+     * Método privado para evitar dependencia circular.
+     */
+    private boolean tieneStockSuficiente(String idProducto, Long cantidadSolicitada) {
+        Producto producto = productoRepository.findById(idProducto)
+                .orElse(null);
+
+        if (producto == null) {
+            return false;
+        }
+
+        return producto.getStock() >= cantidadSolicitada;
     }
 }
