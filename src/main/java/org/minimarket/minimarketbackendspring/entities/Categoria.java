@@ -15,15 +15,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "CATEGORIA")
 public class Categoria {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CATEGORIA_id_gen")
-    @SequenceGenerator(name = "CATEGORIA_id_gen", sequenceName = "categoria_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_CATEGORIA", nullable = false)
     private Long id;
 

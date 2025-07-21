@@ -2,6 +2,7 @@ package org.minimarket.minimarketbackendspring.controllers;
 
 import java.util.List;
 
+import org.minimarket.minimarketbackendspring.dtos.TokenRefreshResponseDTO;
 import org.minimarket.minimarketbackendspring.dtos.UsuarioDTO;
 import org.minimarket.minimarketbackendspring.dtos.requests.LoginRequestDTO;
 import org.minimarket.minimarketbackendspring.entities.Usuario;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsuarioController {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
+
     public void ejemploMetodo() {
         logger.info("Este es un mensaje informativo");
         logger.error("Este es un mensaje de error");
@@ -49,7 +51,8 @@ public class UsuarioController {
      */
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> getAllUsuarios() {
-        ejemploMetodo();;
+        ejemploMetodo();
+        ;
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
@@ -136,7 +139,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.findByRolNot(rol));
     }
 
-
     /**
      * Crea un nuevo usuario.
      *
@@ -152,15 +154,35 @@ public class UsuarioController {
     /**
      * Actualiza un usuario existente.
      *
-     * @param id el identificador del usuario a actualizar
+     * @param id      el identificador del usuario a actualizar
      * @param usuario el objeto UsuarioDTO con los datos actualizados
-     * @return
+     * @return respuesta que incluye si se requiere refresh del token
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUsuario(@PathVariable String id, @RequestBody UsuarioDTO usuario) {
-        usuario.setId(id);
-        usuarioService.update(usuario);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<TokenRefreshResponseDTO> updateUsuario(@PathVariable String id,
+            @RequestBody UsuarioDTO usuario) {
+        try {
+            // Obtener datos actuales del usuario para comparar el rol
+            UsuarioDTO usuarioActual = usuarioService.findById(id);
+            String rolAnterior = usuarioActual.getRol();
+
+            usuario.setId(id);
+            usuarioService.update(usuario);
+
+            // Verificar si cambió el rol
+            boolean cambioRol = !rolAnterior.equals(usuario.getRol());
+            boolean requiresRefresh = cambioRol && authService.requiresTokenRefresh(id);
+
+            String message = cambioRol ? "Usuario actualizado. El rol cambió, se requiere actualizar la sesión."
+                    : "Usuario actualizado correctamente.";
+
+            return ResponseEntity.ok(new TokenRefreshResponseDTO(true, message, requiresRefresh));
+
+        } catch (Exception e) {
+            logger.error("Error al actualizar usuario: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new TokenRefreshResponseDTO(false, "Error al actualizar usuario: " + e.getMessage(), false));
+        }
     }
 
     /**
@@ -177,11 +199,28 @@ public class UsuarioController {
 
     @PostMapping("/auth")
     public ResponseEntity<Boolean> authenticate(@RequestBody LoginRequestDTO loginRequestDTO) {
-        Usuario usuario = authService.authenticateTraditional(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-        if (usuario != null) {
-            return ResponseEntity.ok(true); // OK
-        } else {
-            return ResponseEntity.status(401).body(false); // Unauthorized
+        Usuario usuario = authService.authenticateTraditional(loginRequestDTO.getEmail(),
+                loginRequestDTO.getPassword());
+        return ResponseEntity.ok(usuario != null);
+    }
+
+    /**
+     * Endpoint para notificar al frontend que debe refrescar el token
+     * 
+     * @param userId ID del usuario
+     * @return información sobre si se requiere refresh
+     */
+    @GetMapping("/{userId}/token-status")
+    public ResponseEntity<TokenRefreshResponseDTO> checkTokenStatus(@PathVariable String userId) {
+        try {
+            boolean requiresRefresh = authService.requiresTokenRefresh(userId);
+            String message = requiresRefresh ? "Se requiere actualizar el token de autenticación" : "Token actualizado";
+
+            return ResponseEntity.ok(new TokenRefreshResponseDTO(true, message, requiresRefresh));
+        } catch (Exception e) {
+            logger.error("Error al verificar estado del token: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new TokenRefreshResponseDTO(false, "Error al verificar token", false));
         }
     }
 }

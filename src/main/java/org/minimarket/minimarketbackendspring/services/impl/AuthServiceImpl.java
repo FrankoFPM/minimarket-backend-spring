@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Buscar usuario existente o crear uno nuevo
         Optional<Usuario> existingUser = usuarioRepository.findByEmail(email);
-        
+
         if (existingUser.isPresent()) {
             Usuario usuario = existingUser.get();
             UsuarioDTO usuDTO = usuarioService.convertToDTO(usuario);
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Usuario authenticateTraditional(String email, String password) {
         Optional<Usuario> userOptional = usuarioRepository.findByEmail(email);
-        
+
         if (userOptional.isPresent()) {
             Usuario usuario = userOptional.get();
             // Verificar si el usuario tiene contraseña (no es usuario social)
@@ -93,6 +93,11 @@ public class AuthServiceImpl implements AuthService {
                 if (passwordEncoder.matches(password, usuario.getClave())) {
                     return usuario;
                 }
+            }
+            try {
+                syncFirebaseClaims(usuario.getIdUsuario(), usuario.getRol());
+            } catch (FirebaseAuthException e) {
+                throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
             }
         }
         return null;
@@ -104,7 +109,8 @@ public class AuthServiceImpl implements AuthService {
     private void updateSocialProviderIds(UsuarioDTO usuario, String uid, String providerId) {
         if ("google.com".equals(providerId) && (usuario.getGoogleId() == null || usuario.getGoogleId().isEmpty())) {
             usuario.setGoogleId(uid);
-        } else if ("facebook.com".equals(providerId) && (usuario.getFacebookId() == null || usuario.getFacebookId().isEmpty())) {
+        } else if ("facebook.com".equals(providerId)
+                && (usuario.getFacebookId() == null || usuario.getFacebookId().isEmpty())) {
             usuario.setFacebookId(uid);
         }
     }
@@ -123,15 +129,15 @@ public class AuthServiceImpl implements AuthService {
 
         // Asignar el nombre y apellido según los fragmentos disponibles
         newUser.setNombre(nameParts.length > 0 ? nameParts[0] : "Usuario");
-        newUser.setApellido(nameParts.length > 1 ?
-                String.join(" ", nameParts.length > 2 ?
-                        new String[]{nameParts[nameParts.length - 2], nameParts[nameParts.length - 1]} :
-                        new String[]{nameParts[1]}) : "");
-        
+        newUser.setApellido(nameParts.length > 1 ? String.join(" ",
+                nameParts.length > 2 ? new String[] { nameParts[nameParts.length - 2], nameParts[nameParts.length - 1] }
+                        : new String[] { nameParts[1] })
+                : "");
+
         // Establecer valores por defecto
         newUser.setTelefono("");
         newUser.setPassword("");
-        newUser.setDistritoId(  null);
+        newUser.setDistritoId(null);
         newUser.setDireccion("");
         newUser.setGoogleId("");
         newUser.setFacebookId("");
@@ -148,8 +154,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             syncFirebaseClaims(uid, newUser.getRol());
         } catch (FirebaseAuthException e) {
-            // Manejo del error, por ejemplo, loguear la excepción
-            e.printStackTrace();
+            throw new RuntimeException("Error al sincronizar los claims de Firebase: " + e.getMessage(), e);
         }
 
         return newUser;
@@ -163,4 +168,10 @@ public class AuthServiceImpl implements AuthService {
         System.out.println("Claims sincronizados para el usuario con UID: " + uid + ", rol: " + rol);
     }
 
+    @Override
+    public boolean requiresTokenRefresh(String userId) {
+        // Siempre retorna true cuando se cambia un rol
+        // En el futuro podrías implementar una cache para optimizar esto
+        return true;
+    }
 }
